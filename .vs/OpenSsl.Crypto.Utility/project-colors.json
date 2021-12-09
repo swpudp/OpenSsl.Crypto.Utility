@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "3df532fa-04e7-4566-b386-aabe0f7b3e1b": {
+      "ProjectGuid": "3df532fa-04e7-4566-b386-aabe0f7b3e1b",
+      "DisplayName": "OpenSsl.Crypto.Utility",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}

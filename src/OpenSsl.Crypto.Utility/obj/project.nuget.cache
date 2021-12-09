@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "Krw+GqCchSs48ZiRa1ROaiEr0E9ord7A0xAbeyGXvLIggcPH9+btkiZI7x67fa5Stn/Zk0GWKF0avFyCgcuJXA==",
+  "success": true,
+  "projectFilePath": "E:\\Sources\\OpenSsl.Crypto.Utility\\src\\OpenSsl.Crypto.Utility\\OpenSsl.Crypto.Utility.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\dingpin\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\dingpin\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
+    "C:\\Users\\dingpin\\.nuget\\packages\\portable.bouncycastle\\1.8.10\\portable.bouncycastle.1.8.10.nupkg.sha512"
+  ],
+  "logs": []
+}
