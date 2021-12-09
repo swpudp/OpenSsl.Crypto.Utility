@@ -1,9 +1,0 @@
-E:\Sources\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility\bin\Debug\netstandard2.0\OpenSsl.Crypto.Utility.deps.json
-E:\Sources\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility\bin\Debug\netstandard2.0\OpenSsl.Crypto.Utility.dll
-E:\Sources\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility\bin\Debug\netstandard2.0\OpenSsl.Crypto.Utility.pdb
-E:\Sources\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility\obj\Debug\netstandard2.0\OpenSsl.Crypto.Utility.GeneratedMSBuildEditorConfig.editorconfig
-E:\Sources\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility\obj\Debug\netstandard2.0\OpenSsl.Crypto.Utility.AssemblyInfoInputs.cache
-E:\Sources\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility\obj\Debug\netstandard2.0\OpenSsl.Crypto.Utility.AssemblyInfo.cs
-E:\Sources\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility\obj\Debug\netstandard2.0\OpenSsl.Crypto.Utility.csproj.CoreCompileInputs.cache
-E:\Sources\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility\obj\Debug\netstandard2.0\OpenSsl.Crypto.Utility.dll
-E:\Sources\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility\obj\Debug\netstandard2.0\OpenSsl.Crypto.Utility.pdb
