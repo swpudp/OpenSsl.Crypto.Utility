@@ -166,7 +166,7 @@ namespace UnitTests
         /// md5 Hmac计算摘要测试
         /// </summary>
         [TestMethod]
-        public void HmacEncryptTest()
+        public void HmacMd5Test()
         {
             string content = "123456";
             string key = "0102030405060708090a0b0c0d0e0f10111213141516171819";

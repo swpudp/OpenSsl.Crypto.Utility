@@ -45,7 +45,7 @@ namespace UnitTests
             string data = "123456";
             byte[] signBytes = SignatureUtils.RsaSignToBytes(Convert.FromBase64String(privateKey), Encoding.UTF8.GetBytes(data), RsaSignerAlgorithm.SHA1withRSA);
             Assert.IsNotNull(signBytes);
-            string sign = Org.BouncyCastle.Utilities.Encoders.Hex.ToHexString(signBytes);
+            string sign = SimpleCoder.EncodeBytes(signBytes);
             Assert.IsNotNull(sign);
             Console.WriteLine("RsaSignToBytesTest->sign:" + sign);
         }
@@ -60,9 +60,9 @@ namespace UnitTests
                 "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDMsyV0GGupSENjIZqsIittuRIX5ELI8Mhw82SLfHBsRJ2Sdbcb9kVgeBbhPKs/pT5aqjBjyiNC8jXgxwbFKgs50nEv7hANpTRXvwcn1j6Rg9muPV+xnbjg2ygudOzaXbCjENHRs4sD1jkYpSG+avpZYWI6KTn0eq0WzqNtMMKT6QIDAQAB";
             string data = "123456";
             string sign =
-                "20a766e18f7c35d1b7e8326ed5810c5118858b1679841f9b281c3a55d9ff11a471057db868579e002a9c9e5dbb052d471903eba8a5e22c8dd2955f0ecf2fe0f611363f29b327111ef1b0f74f69014eaee24b7e30ae391f5601f312f0e053aca2422b9123ece962a13aaf6840b13d27242eccc8b6f02282735c55ecaf56226d66";
-            bool isSign = SignatureUtils.RsaVerifyFromBytes(Convert.FromBase64String(publicKey), Encoding.UTF8.GetBytes(data),
-                Org.BouncyCastle.Utilities.Encoders.Hex.Decode(sign), RsaSignerAlgorithm.SHA1withRSA);
+                "MjBhNzY2ZTE4ZjdjMzVkMWI3ZTgzMjZlZDU4MTBjNTExODg1OGIxNjc5ODQxZjliMjgxYzNhNTVkOWZmMTFhNDcxMDU3ZGI4Njg1NzllMDAyYTljOWU1ZGJiMDUyZDQ3MTkwM2ViYThhNWUyMmM4ZGQyOTU1ZjBlY2YyZmUwZjYxMTM2M2YyOWIzMjcxMTFlZjFiMGY3NGY2OTAxNGVhZWUyNGI3ZTMwYWUzOTFmNTYwMWYzMTJmMGUwNTNhY2EyNDIyYjkxMjNlY2U5NjJhMTNhYWY2ODQwYjEzZDI3MjQyZWNjYzhiNmYwMjI4MjczNWM1NWVjYWY1NjIyNmQ2Ng==";
+            byte[] signBytes = SimpleCoder.DecodeBytes(sign);
+            bool isSign = SignatureUtils.RsaVerifyFromBytes(Convert.FromBase64String(publicKey), Encoding.UTF8.GetBytes(data), signBytes, RsaSignerAlgorithm.SHA1withRSA);
             Assert.AreEqual(true, isSign);
         }
 

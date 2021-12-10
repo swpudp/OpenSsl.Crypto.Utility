@@ -31,24 +31,6 @@ namespace UnitTests
         }
 
         /// <summary>
-        /// 解密测试
-        /// </summary>
-        /// <returns></returns>
-        [TestMethod]
-        public void DecryptFromBase64WithCBCPKCS5Test()
-        {
-            Encoding encoding = Encoding.UTF8;
-            string secret = "ZWNyOC00MjAhLWFmNjEtMzAhYTYxZDEhMWV2MC42NjP2MjA0NDY3NDU5MjgwLjk4";
-            string secretHex = DigestUtils.Md5(DigestUtils.Sha256(secret, encoding), encoding);
-            string key = secretHex.Substring(0, 24);
-            string iv = secretHex.Substring(24);
-            var cipher = "Zp3u+AGxLBA=";
-            string actual = CryptoUtils.DesDecryptFromBase64(cipher, key, CipherMode.CBC, CipherPadding.PKCS5, iv);
-            string expected = "123456";
-            Assert.AreEqual(expected, actual);
-        }
-
-        /// <summary>
         /// 加密测试
         /// </summary>
         /// <returns></returns>
@@ -81,6 +63,24 @@ namespace UnitTests
             string cipher = CryptoUtils.DesEncryptToBase64(content, key, CipherMode.CBC, CipherPadding.PKCS5);
             string plainText = CryptoUtils.DesDecryptFromBase64(cipher, key, CipherMode.CBC, CipherPadding.PKCS5);
             Assert.AreEqual(content, plainText);
+        }
+
+        /// <summary>
+        /// 解密测试
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public void DecryptFromBase64WithCBCPKCS5Test()
+        {
+            Encoding encoding = Encoding.UTF8;
+            string secret = "ZWNyOC00MjAhLWFmNjEtMzAhYTYxZDEhMWV2MC42NjP2MjA0NDY3NDU5MjgwLjk4";
+            string secretHex = DigestUtils.Md5(DigestUtils.Sha256(secret, encoding), encoding);
+            string key = secretHex.Substring(0, 24);
+            string iv = secretHex.Substring(24);
+            var cipher = "Zp3u+AGxLBA=";
+            string actual = CryptoUtils.DesDecryptFromBase64(cipher, key, CipherMode.CBC, CipherPadding.PKCS5, iv);
+            string expected = "123456";
+            Assert.AreEqual(expected, actual);
         }
     }
 }
