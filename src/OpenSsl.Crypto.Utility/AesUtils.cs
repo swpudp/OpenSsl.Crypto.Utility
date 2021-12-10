@@ -3,22 +3,21 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities.Encoders;
 using System;
-using System.Linq;
 using System.Text;
 
 namespace OpenSsl.Crypto.Utility
 {
     /// <summary>
-    /// AES加密工具 todo 待单元测试
+    /// AES加密工具
     /// </summary>
-    public static class AesUtils
+    internal static class AesUtils
     {
         /// <summary>
         /// 加密
         /// </summary>
         /// <remarks>nonceBytes用于GCM加密模式</remarks>
         /// <returns>密文字节数组</returns>
-        public static byte[] EncryptToBytes(byte[] plainBytes, byte[] keyBytes, byte[] ivBytes, byte[] nonceBytes, CipherMode cipherMode, CipherPadding cipherPadding)
+        internal static byte[] EncryptToBytes(byte[] plainBytes, byte[] keyBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] ivBytes = null, byte[] nonceBytes = null)
         {
             string algorithm = AlgorithmUtils.GetCipherAlgorithm("AES", cipherMode, cipherPadding);
             IBufferedCipher cipher = CipherUtilities.GetCipher(algorithm);
@@ -38,7 +37,7 @@ namespace OpenSsl.Crypto.Utility
             {
                 return new AeadParameters(keyParameter, 128, ivBytes, nonceBytes);
             }
-            if (ivBytes != null && ivBytes.Any(f => f > 0))
+            if (ivBytes != null)
             {
                 return new ParametersWithIV(keyParameter, ivBytes);
             }
@@ -50,7 +49,7 @@ namespace OpenSsl.Crypto.Utility
         /// </summary>
         /// <remarks>nonceBytes用于GCM加密模式</remarks>
         /// <returns>明文</returns>
-        public static string DecryptFromBytes(byte[] plainBytes, byte[] keyBytes, byte[] ivBytes, byte[] nonceBytes, CipherMode cipherMode, CipherPadding cipherPadding)
+        internal static string DecryptFromBytes(byte[] plainBytes, byte[] keyBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] ivBytes = null, byte[] nonceBytes = null)
         {
             string algorithm = AlgorithmUtils.GetCipherAlgorithm("AES", cipherMode, cipherPadding);
             IBufferedCipher cipher = CipherUtilities.GetCipher(algorithm);
@@ -65,7 +64,7 @@ namespace OpenSsl.Crypto.Utility
         /// </summary>
         /// <remarks>nonce用于GCM加密模式</remarks>
         /// <returns>密文十六进制字符</returns>
-        public static string EncryptToHex(string plainText, string key, string iv, string nonce, CipherMode cipherMode, CipherPadding cipherPadding)
+        internal static string EncryptToHex(string plainText, string key, CipherMode cipherMode, CipherPadding cipherPadding, string iv = null, string nonce = null)
         {
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
@@ -79,7 +78,7 @@ namespace OpenSsl.Crypto.Utility
             {
                 nonceBytes = Encoding.UTF8.GetBytes(nonce);
             }
-            byte[] cipherBytes = EncryptToBytes(plainBytes, keyBytes, ivBytes, nonceBytes, cipherMode, cipherPadding);
+            byte[] cipherBytes = EncryptToBytes(plainBytes, keyBytes, cipherMode, cipherPadding, ivBytes, nonceBytes);
             return Hex.ToHexString(cipherBytes);
         }
 
@@ -88,7 +87,7 @@ namespace OpenSsl.Crypto.Utility
         /// </summary>
         /// <remarks>nonce用于GCM加密模式</remarks>
         /// <returns>明文</returns>
-        public static string DecryptFromHex(string cipher, string key, string iv, string nonce, CipherMode cipherMode, CipherPadding cipherPadding)
+        internal static string DecryptFromHex(string cipher, string key, CipherMode cipherMode, CipherPadding cipherPadding, string iv = null, string nonce = null)
         {
             byte[] cipherBytes = Hex.Decode(cipher);
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
@@ -102,7 +101,7 @@ namespace OpenSsl.Crypto.Utility
             {
                 nonceBytes = Encoding.UTF8.GetBytes(nonce);
             }
-            return DecryptFromBytes(cipherBytes, keyBytes, ivBytes, nonceBytes, cipherMode, cipherPadding);
+            return DecryptFromBytes(cipherBytes, keyBytes, cipherMode, cipherPadding, ivBytes, nonceBytes);
         }
 
         /// <summary>
@@ -110,7 +109,7 @@ namespace OpenSsl.Crypto.Utility
         /// </summary>
         /// <remarks>nonce用于GCM加密模式</remarks>
         /// <returns>密文base64</returns>
-        public static string EncryptToBase64(string plainText, string key, string iv, string nonce, CipherMode cipherMode, CipherPadding cipherPadding)
+        internal static string EncryptToBase64(string plainText, string key, CipherMode cipherMode, CipherPadding cipherPadding, string iv = null, string nonce = null)
         {
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
@@ -124,7 +123,7 @@ namespace OpenSsl.Crypto.Utility
             {
                 nonceBytes = Encoding.UTF8.GetBytes(nonce);
             }
-            byte[] cipherBytes = EncryptToBytes(plainBytes, keyBytes, ivBytes, nonceBytes, cipherMode, cipherPadding);
+            byte[] cipherBytes = EncryptToBytes(plainBytes, keyBytes, cipherMode, cipherPadding, ivBytes, nonceBytes);
             return Convert.ToBase64String(cipherBytes);
         }
 
@@ -133,7 +132,7 @@ namespace OpenSsl.Crypto.Utility
         /// </summary>
         /// <remarks>nonce用于GCM加密模式</remarks>
         /// <returns>明文</returns>
-        public static string DecryptFromBase64(string cipher, string key, string iv, string nonce, CipherMode cipherMode, CipherPadding cipherPadding)
+        internal static string DecryptFromBase64(string cipher, string key, CipherMode cipherMode, CipherPadding cipherPadding, string iv = null, string nonce = null)
         {
             byte[] cipherBytes = Convert.FromBase64String(cipher);
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
@@ -147,7 +146,7 @@ namespace OpenSsl.Crypto.Utility
             {
                 nonceBytes = Encoding.UTF8.GetBytes(nonce);
             }
-            return DecryptFromBytes(cipherBytes, keyBytes, ivBytes, nonceBytes, cipherMode, cipherPadding);
+            return DecryptFromBytes(cipherBytes, keyBytes, cipherMode, cipherPadding, ivBytes, nonceBytes);
         }
     }
 }

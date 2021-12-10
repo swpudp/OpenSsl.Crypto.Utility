@@ -23,13 +23,16 @@ namespace OpenSsl.Crypto.Utility
         /// SM3计算摘要
         /// </summary>
         /// <param name="data">待计算字符</param>
+        /// <param name="encoding">编码</param>
         /// <returns>摘要字符</returns>
-        public static string Digest(string data)
+        internal static string Digest(string data, Encoding encoding)
         {
-            SM3Digest sm3 = new SM3Digest();
-            byte[] cipherBytes = DigestUtils.ComputeHashBytes(sm3, data, Encoding.UTF8);
+            SM3Digest digest = new SM3Digest();
+            byte[] cipherBytes = digest.ComputeHashBytes(data, encoding);
             return Encoding.UTF8.GetString(Hex.Encode(cipherBytes));
         }
+
+        #region 加密
 
         /// <summary>
         /// SM4加密
@@ -41,28 +44,12 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="iv">密钥偏移量</param>
         /// <remarks>密钥长度必须是128位</remarks>
         /// <returns>十六进制字符串密文</returns>
-        public static string EncryptToHex(string secretHex, string plainText, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
+        internal static string EncryptToHex(string secretHex, string plainText, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
         {
             //将加密报文转化为字节数组utf8
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] output = EncryptToBytes(secretHex, plainBytes, cipherMode, cipherPadding, iv);
             return Hex.ToHexString(output);
-        }
-
-        /// <summary>
-        /// SM4解密
-        /// </summary>
-        /// <param name="secret">十六进制密钥（128位）</param>
-        /// <param name="cipher">十六进制字符串密文</param>
-        /// <param name="cipherMode">加密模式</param>
-        /// <param name="cipherPadding">数据填充方式</param>
-        /// <param name="iv">密钥偏移量</param>
-        /// <remarks>密钥长度必须是128位</remarks>
-        /// <returns>明文</returns>
-        public static string DecryptFromHex(string secret, string cipher, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
-        {
-            byte[] cipherBytes = Hex.Decode(cipher);
-            return DecryptFromBytes(secret, cipherBytes, cipherMode, cipherPadding, iv);
         }
 
         /// <summary>
@@ -75,46 +62,12 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="iv">密钥偏移量</param>
         /// <remarks>密钥长度必须是128位</remarks>
         /// <returns>Base64密文</returns>
-        public static string EncryptToBase64(string secretHex, string plainText, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
+        internal static string EncryptToBase64(string secretHex, string plainText, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
         {
             //将加密报文转化为字节数组utf8
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] output = EncryptToBytes(secretHex, plainBytes, cipherMode, cipherPadding, iv);
             return Convert.ToBase64String(output);
-        }
-
-        /// <summary>
-        /// SM4解密
-        /// </summary>
-        /// <param name="secretHex">十六进制密钥（128位）</param>
-        /// <param name="cipher">从十六进制字符串密文</param>
-        /// <param name="cipherMode">加密模式</param>
-        /// <param name="cipherPadding">数据填充方式</param>
-        /// <param name="iv">密钥偏移量</param>
-        /// <remarks>密钥长度必须是128位</remarks>
-        /// <returns>明文</returns>
-        public static string DecryptFromBase64(string secretHex, string cipher, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
-        {
-            byte[] cipherBytes = Convert.FromBase64String(cipher);
-            return DecryptFromBytes(secretHex, cipherBytes, cipherMode, cipherPadding, iv);
-        }
-
-        /// <summary>
-        /// SM4解密
-        /// </summary>
-        /// <param name="secretHex">十六进制密钥（128位）</param>
-        /// <param name="cipherBytes">密文字节</param>
-        /// <param name="cipherMode">加密模式</param>
-        /// <param name="cipherPadding">数据填充方式</param>
-        /// <param name="iv">密钥偏移量</param>
-        /// <remarks>密钥长度必须是128位</remarks>
-        /// <returns>明文字节数组</returns>
-        public static string DecryptFromBytes(string secretHex, byte[] cipherBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
-        {
-            byte[] secretBytes = Hex.Decode(secretHex);
-            IBufferedCipher cipher = GetSm4Cipher(secretBytes, cipherMode, cipherPadding, false, iv);
-            byte[] output = cipher.DoFinal(cipherBytes);
-            return Encoding.UTF8.GetString(output);
         }
 
         /// <summary>
@@ -127,12 +80,68 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="iv">密钥偏移量</param>
         /// <remarks>密钥长度必须是128位</remarks>
         /// <returns>密文字节数组</returns>
-        public static byte[] EncryptToBytes(string secretHex, byte[] plainBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
+        internal static byte[] EncryptToBytes(string secretHex, byte[] plainBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
         {
             byte[] secretKeyBytes = Hex.Decode(secretHex);
             IBufferedCipher cipher = GetSm4Cipher(secretKeyBytes, cipherMode, cipherPadding, true, iv);
             return cipher.DoFinal(plainBytes);
         }
+
+        #endregion
+
+        #region 解密
+
+        /// <summary>
+        /// SM4解密
+        /// </summary>
+        /// <param name="secretHex">十六进制密钥（128位）</param>
+        /// <param name="cipher">从十六进制字符串密文</param>
+        /// <param name="cipherMode">加密模式</param>
+        /// <param name="cipherPadding">数据填充方式</param>
+        /// <param name="iv">密钥偏移量</param>
+        /// <remarks>密钥长度必须是128位</remarks>
+        /// <returns>明文</returns>
+        internal static string DecryptFromBase64(string secretHex, string cipher, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
+        {
+            byte[] cipherBytes = Convert.FromBase64String(cipher);
+            return DecryptFromBytes(secretHex, cipherBytes, cipherMode, cipherPadding, iv);
+        }
+
+        /// <summary>
+        /// SM4解密
+        /// </summary>
+        /// <param name="secret">十六进制密钥（128位）</param>
+        /// <param name="cipher">十六进制字符串密文</param>
+        /// <param name="cipherMode">加密模式</param>
+        /// <param name="cipherPadding">数据填充方式</param>
+        /// <param name="iv">密钥偏移量</param>
+        /// <remarks>密钥长度必须是128位</remarks>
+        /// <returns>明文</returns>
+        internal static string DecryptFromHex(string secret, string cipher, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
+        {
+            byte[] cipherBytes = Hex.Decode(cipher);
+            return DecryptFromBytes(secret, cipherBytes, cipherMode, cipherPadding, iv);
+        }
+
+        /// <summary>
+        /// SM4解密
+        /// </summary>
+        /// <param name="secretHex">十六进制密钥（128位）</param>
+        /// <param name="cipherBytes">密文字节</param>
+        /// <param name="cipherMode">加密模式</param>
+        /// <param name="cipherPadding">数据填充方式</param>
+        /// <param name="iv">密钥偏移量</param>
+        /// <remarks>密钥长度必须是128位</remarks>
+        /// <returns>明文字节数组</returns>
+        internal static string DecryptFromBytes(string secretHex, byte[] cipherBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
+        {
+            byte[] secretBytes = Hex.Decode(secretHex);
+            IBufferedCipher cipher = GetSm4Cipher(secretBytes, cipherMode, cipherPadding, false, iv);
+            byte[] output = cipher.DoFinal(cipherBytes);
+            return Encoding.UTF8.GetString(output);
+        }
+
+        #endregion
 
         /// <summary>
         /// 获取SM4加密程序
@@ -163,7 +172,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="privateKey">公钥</param>
         /// <param name="content">待签名内容</param>
         /// <returns>签名字符串</returns>
-        public static string SignToHex(string privateKey, string content)
+        internal static string SignToHex(string privateKey, string content)
         {
             byte[] result = SignToBytes(privateKey, content);
             return Hex.ToHexString(result);
@@ -175,7 +184,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="privateKey">公钥</param>
         /// <param name="content">待签名内容</param>
         /// <returns>签名字符串</returns>
-        public static string SignToBase64(string privateKey, string content)
+        internal static string SignToBase64(string privateKey, string content)
         {
             byte[] result = SignToBytes(privateKey, content);
             return Convert.ToBase64String(result);
@@ -188,7 +197,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="content">待签名内容</param>
         /// <remarks>适用于对签名字节数组自行编码</remarks>
         /// <returns>签名字节数组</returns>
-        public static byte[] SignToBytes(string privateKey, string content)
+        internal static byte[] SignToBytes(string privateKey, string content)
         {
             //待签名内容
             byte[] contentBytes = Encoding.UTF8.GetBytes(content);
@@ -218,10 +227,10 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="content">待签名内容,如有其他处理如加密一次等，请先处理后传入</param>
         /// <param name="signBase64">签名值（base64）</param>
         /// <returns>是否成功</returns>
-        public static bool VerifySignFromBase64(string content, string publicKey, string signBase64)
+        internal static bool VerifyFromBase64(string content, string publicKey, string signBase64)
         {
             byte[] signBytes = Convert.FromBase64String(signBase64);
-            return VerifySignFromBytes(content, publicKey, signBytes);
+            return VerifyFromBytes(content, publicKey, signBytes);
         }
 
         /// <summary>
@@ -231,10 +240,10 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="content">待签名内容,如有其他处理如加密一次等，请先处理后传入</param>
         /// <param name="signHex">签名值</param>
         /// <returns>是否成功</returns>
-        public static bool VerifySignFromHex(string content, string publicKey, string signHex)
+        internal static bool VerifyFromHex(string content, string publicKey, string signHex)
         {
             byte[] signResultBytes = Hex.Decode(signHex);
-            return VerifySignFromBytes(content, publicKey, signResultBytes);
+            return VerifyFromBytes(content, publicKey, signResultBytes);
         }
 
         /// <summary>
@@ -245,7 +254,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="signBytes">签名值字节数组</param>
         /// <remarks>适用于自定义签名解码</remarks>
         /// <returns>是否成功</returns>
-        public static bool VerifySignFromBytes(string content, string publicKey, byte[] signBytes)
+        internal static bool VerifyFromBytes(string content, string publicKey, byte[] signBytes)
         {
             byte[] publicKeyBytes = Hex.Decode(publicKey);
             ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(DomainParameters.Curve.DecodePoint(publicKeyBytes), DomainParameters);

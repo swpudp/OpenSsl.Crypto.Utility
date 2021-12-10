@@ -56,7 +56,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="cipcherMode"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        public static string GetCipherAlgorithm(string algorithmName, CipherMode cipcherMode, CipherPadding padding)
+        internal static string GetCipherAlgorithm(string algorithmName, CipherMode cipcherMode, CipherPadding padding)
         {
             return $"{algorithmName}/{GetCipherMode(cipcherMode)}/{GetCipherPadding(padding)}";
         }

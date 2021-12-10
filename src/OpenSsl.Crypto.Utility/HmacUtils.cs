@@ -8,7 +8,7 @@ namespace OpenSsl.Crypto.Utility
     /// <summary>
     /// HMAC加密辅助工具
     /// </summary>
-    public static class HmacUtils
+    internal static class HmacUtils
     {
         /// <summary>
         /// HMacSha1加密
@@ -17,10 +17,10 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="key">密钥</param>
         /// <param name="encoding">编码</param>
         /// <returns>密文</returns>
-        public static string Sha1(string key, string data, Encoding encoding)
+        internal static string Sha1(string key, string data, Encoding encoding)
         {
             HMac hmac = new HMac(new Sha1Digest());
-            var hashBytes = DigestUtils.ComputeHashBytes(hmac, key, data, encoding);
+            var hashBytes = hmac.ComputeHashBytes(key, data, encoding);
             return encoding.GetString(Hex.Encode(hashBytes));
         }
 
@@ -31,10 +31,10 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="key">密钥</param>
         /// <param name="encoding">编码</param>
         /// <returns>密文</returns>
-        public static string Sha224(string key, string data, Encoding encoding)
+        internal static string Sha224(string key, string data, Encoding encoding)
         {
             HMac hmac = new HMac(new Sha224Digest());
-            var hashBytes = DigestUtils.ComputeHashBytes(hmac, key, data, encoding);
+            var hashBytes = hmac.ComputeHashBytes(key, data, encoding);
             return encoding.GetString(Hex.Encode(hashBytes));
         }
 
@@ -44,10 +44,10 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="data">明文</param>
         /// <param name="encoding">编码</param>
         /// <returns>密文</returns>
-        public static string Sha256(string key, string data, Encoding encoding)
+        internal static string Sha256(string key, string data, Encoding encoding)
         {
             HMac hmac = new HMac(new Sha256Digest());
-            var hashBytes = DigestUtils.ComputeHashBytes(hmac, key, data, encoding);
+            var hashBytes = hmac.ComputeHashBytes(key, data, encoding);
             return encoding.GetString(Hex.Encode(hashBytes));
         }
 
@@ -57,10 +57,10 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="data">明文</param>
         /// <param name="encoding">编码</param>
         /// <returns>密文</returns>
-        public static string Sha384(string key, string data, Encoding encoding)
+        internal static string Sha384(string key, string data, Encoding encoding)
         {
             HMac hmac = new HMac(new Sha384Digest());
-            var hashBytes = DigestUtils.ComputeHashBytes(hmac, key, data, encoding);
+            var hashBytes = hmac.ComputeHashBytes(key, data, encoding);
             return encoding.GetString(Hex.Encode(hashBytes));
         }
 
@@ -70,10 +70,10 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="data">明文</param>
         /// <param name="encoding">编码</param>
         /// <returns>密文</returns>
-        public static string Sha512(string key, string data, Encoding encoding)
+        internal static string Sha512(string key, string data, Encoding encoding)
         {
             HMac hmac = new HMac(new Sha512Digest());
-            var hashBytes = DigestUtils.ComputeHashBytes(hmac, key, data, encoding);
+            var hashBytes = hmac.ComputeHashBytes(key, data, encoding);
             return encoding.GetString(Hex.Encode(hashBytes));
         }
 
@@ -84,10 +84,10 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="data">待加密字符</param>
         /// <param name="encoding">编码</param>
         /// <returns>密文</returns>
-        public static string Md5(string key, string data, Encoding encoding)
+        internal static string Md5(string key, string data, Encoding encoding)
         {
             HMac hmac = new HMac(new MD5Digest());
-            var hashBytes = DigestUtils.ComputeHashBytes(hmac, key, data, encoding);
+            var hashBytes = hmac.ComputeHashBytes(key, data, encoding);
             return encoding.GetString(Hex.Encode(hashBytes));
         }
     }

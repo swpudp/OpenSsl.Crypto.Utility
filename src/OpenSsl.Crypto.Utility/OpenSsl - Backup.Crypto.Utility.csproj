@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -7,8 +7,8 @@
 		<RepositoryUrl>https://github.com/swpudp/OpenSsl.Crypto.Utility</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>crypto,openssl,bc</PackageTags>
-		<AssemblyVersion>1.0.1.1</AssemblyVersion>
-		<FileVersion>1.0.1.1</FileVersion>
+		<AssemblyVersion>1.0.0.1</AssemblyVersion>
+		<FileVersion>1.0.0.1</FileVersion>
 		<EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
 		<EnableNETAnalyzers>False</EnableNETAnalyzers>
 		<PackageReleaseNotes>add des,unit tests</PackageReleaseNotes>
@@ -17,7 +17,7 @@
 		<Company>swpudp</Company>
 		<Authors>swpudp</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>$(VersionPrefix)</Version>
+		<Version>1.0.0.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -279,6 +279,8 @@ namespace OpenSsl.Crypto.Utility
             }
         }
 
+        #region 加密
+
         /// <summary>
         /// 加密
         /// </summary>
@@ -287,27 +289,12 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="cipherMode">加密模式</param>
         /// <param name="padding">填充方式</param>
         /// <returns>密文hex</returns>
-        public static string EncryptToHex(string plainText, string publicKey, CipherMode cipherMode, CipherPadding padding)
+        internal static string EncryptToHex(string plainText, string publicKey, CipherMode cipherMode, CipherPadding padding)
         {
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
             byte[] result = EncryptToBytes(plainBytes, publicKeyBytes, cipherMode, padding);
-            return Convert.ToBase64String(result);
-        }
-
-        /// <summary>
-        /// 解密
-        /// </summary>
-        /// <param name="cipherHex">密文hex</param>
-        /// <param name="privateKey">私钥</param>
-        /// <param name="cipherMode">加密模式</param>
-        /// <param name="padding">填充方式</param>
-        /// <returns>明文</returns>
-        public static string DecryptFromHex(string cipherHex, string privateKey, CipherMode cipherMode, CipherPadding padding)
-        {
-            byte[] cipherBytes = Hex.Decode(cipherHex);
-            byte[] privateBytes = Convert.FromBase64String(privateKey);
-            return DecryptFromBytes(cipherBytes, privateBytes, cipherMode, padding);
+            return Hex.ToHexString(result);
         }
 
         /// <summary>
@@ -318,27 +305,12 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="cipherMode">加密模式</param>
         /// <param name="padding">填充方式</param>
         /// <returns>密文base64</returns>
-        public static string EncryptToBase64(string plainText, string publicKey, CipherMode cipherMode, CipherPadding padding)
+        internal static string EncryptToBase64(string plainText, string publicKey, CipherMode cipherMode, CipherPadding padding)
         {
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
             byte[] result = EncryptToBytes(plainBytes, publicKeyBytes, cipherMode, padding);
             return Convert.ToBase64String(result);
-        }
-
-        /// <summary>
-        /// 解密
-        /// </summary>
-        /// <param name="cipherBase64">密文base64</param>
-        /// <param name="privateKey">私钥</param>
-        /// <param name="cipherMode">加密模式</param>
-        /// <param name="padding">填充方式</param>
-        /// <returns>明文</returns>
-        public static string DecryptFromBase64(string cipherBase64, string privateKey, CipherMode cipherMode, CipherPadding padding)
-        {
-            byte[] cipherBytes = Convert.FromBase64String(cipherBase64);
-            byte[] privateBytes = Convert.FromBase64String(privateKey);
-            return DecryptFromBytes(cipherBytes, privateBytes, cipherMode, padding);
         }
 
         /// <summary>
@@ -349,7 +321,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="cipherMode">加密模式</param>
         /// <param name="padding">填充方式</param>
         /// <returns>密文字节数组</returns>
-        public static byte[] EncryptToBytes(byte[] plainBytes, byte[] publicKeyBytes, CipherMode cipherMode, CipherPadding padding)
+        internal static byte[] EncryptToBytes(byte[] plainBytes, byte[] publicKeyBytes, CipherMode cipherMode, CipherPadding padding)
         {
             string algorithm = AlgorithmUtils.GetCipherAlgorithm("RSA", cipherMode, padding);
             IBufferedCipher cipher = CipherUtilities.GetCipher(algorithm);
@@ -359,6 +331,10 @@ namespace OpenSsl.Crypto.Utility
             return cipher.DoFinal(plainBytes, 0, plainBytes.Length);
         }
 
+        #endregion
+
+        #region 解密
+
         /// <summary>
         /// 解密
         /// </summary>
@@ -367,7 +343,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="cipherMode">加密模式</param>
         /// <param name="padding">填充方式</param>
         /// <returns>明文</returns>
-        public static string DecryptFromBytes(byte[] cipherBytes, byte[] privateKeyBytes, CipherMode cipherMode, CipherPadding padding)
+        internal static string DecryptFromBytes(byte[] cipherBytes, byte[] privateKeyBytes, CipherMode cipherMode, CipherPadding padding)
         {
             string algorithm = AlgorithmUtils.GetCipherAlgorithm("RSA", cipherMode, padding);
             IBufferedCipher cipher = CipherUtilities.GetCipher(algorithm);
@@ -378,6 +354,38 @@ namespace OpenSsl.Crypto.Utility
         }
 
         /// <summary>
+        /// 解密
+        /// </summary>
+        /// <param name="cipherHex">密文hex</param>
+        /// <param name="privateKey">私钥</param>
+        /// <param name="cipherMode">加密模式</param>
+        /// <param name="padding">填充方式</param>
+        /// <returns>明文</returns>
+        internal static string DecryptFromHex(string cipherHex, string privateKey, CipherMode cipherMode, CipherPadding padding)
+        {
+            byte[] cipherBytes = Hex.Decode(cipherHex);
+            byte[] privateBytes = Convert.FromBase64String(privateKey);
+            return DecryptFromBytes(cipherBytes, privateBytes, cipherMode, padding);
+        }
+
+        /// <summary>
+        /// 解密
+        /// </summary>
+        /// <param name="cipherBase64">密文base64</param>
+        /// <param name="privateKey">私钥</param>
+        /// <param name="cipherMode">加密模式</param>
+        /// <param name="padding">填充方式</param>
+        /// <returns>明文</returns>
+        internal static string DecryptFromBase64(string cipherBase64, string privateKey, CipherMode cipherMode, CipherPadding padding)
+        {
+            byte[] cipherBytes = Convert.FromBase64String(cipherBase64);
+            byte[] privateBytes = Convert.FromBase64String(privateKey);
+            return DecryptFromBytes(cipherBytes, privateBytes, cipherMode, padding);
+        }
+
+        #endregion
+
+        /// <summary>
         /// 生成自签名证书
         /// </summary>
         /// <param name="domains">域集合</param>
@@ -386,8 +394,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="validTo">有效期结束日期</param>
         /// <param name="caPrivateCert">ca私钥字符</param>
         /// <returns>证书文件字符串</returns>
-        public static string GenerateBySelf(IList<string> domains, int keySizeBits, DateTime validFrom,
-            DateTime validTo, out string caPrivateCert)
+        public static string GenerateBySelf(IList<string> domains, int keySizeBits, DateTime validFrom, DateTime validTo, out string caPrivateCert)
         {
             var keys = GenerateKeyPair(keySizeBits);
             var cert = GenerateCertificate(domains, keys.Public, validFrom, validTo, domains.First(), null,
@@ -420,8 +427,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="caPrivateKeyPath"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static byte[] GenerateFromCa(IList<string> domains, int keySizeBits, DateTime validFrom,
-            DateTime validTo, string caPublicCerPath, string caPrivateKeyPath, string password = default)
+        public static byte[] GenerateFromCa(IList<string> domains, int keySizeBits, DateTime validFrom, DateTime validTo, string caPublicCerPath, string caPrivateKeyPath, string password = default)
         {
             if (!File.Exists(caPublicCerPath))
             {
@@ -557,6 +563,8 @@ namespace OpenSsl.Crypto.Utility
             return subject;
         }
 
+        #region 签名
+
         /// <summary>
         /// 签名
         /// </summary>
@@ -564,7 +572,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="plainBytes">待签名字节</param>
         /// <param name="algorithm">算法名称</param>
         /// <returns></returns>
-        public static byte[] SignToBytes(byte[] privateKey, byte[] plainBytes, RsaSignerAlgorithm algorithm)
+        internal static byte[] SignToBytes(byte[] privateKey, byte[] plainBytes, RsaSignerAlgorithm algorithm)
         {
             var privateKeyInfo = PrivateKeyFactory.CreateKey(privateKey);
             string signAlgorithm = GetAlgorithm(algorithm);
@@ -575,6 +583,40 @@ namespace OpenSsl.Crypto.Utility
         }
 
         /// <summary>
+        /// 签名(十六进制)
+        /// </summary>
+        /// <param name="privateKey">私钥base64</param>
+        /// <param name="plainText">待签名字节</param>
+        /// <param name="algorithm">算法名称</param>
+        /// <returns></returns>
+        internal static string SignToHex(string privateKey, string plainText, RsaSignerAlgorithm algorithm)
+        {
+            var privateKeyBytes = Convert.FromBase64String(privateKey);
+            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+            byte[] signBytes = SignToBytes(privateKeyBytes, plainBytes, algorithm);
+            return Hex.ToHexString(signBytes);
+        }
+
+        /// <summary>
+        /// 签名(Base64)
+        /// </summary>
+        /// <param name="privateKey">私钥base64</param>
+        /// <param name="plainText">待签名字节</param>
+        /// <param name="algorithm">算法名称</param>
+        /// <returns></returns>
+        internal static string SignToBase64(string privateKey, string plainText, RsaSignerAlgorithm algorithm)
+        {
+            var privateKeyBytes = Convert.FromBase64String(privateKey);
+            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+            byte[] signBytes = SignToBytes(privateKeyBytes, plainBytes, algorithm);
+            return Convert.ToBase64String(signBytes);
+        }
+
+        #endregion
+
+        #region 验签
+
+        /// <summary>
         /// 验签
         /// </summary>
         /// <param name="publicKey">公钥字节</param>
@@ -582,8 +624,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="signedBytes">已签名字节</param>
         /// <param name="algorithm">签名算法</param>
         /// <returns></returns>
-        public static bool VerifyFromBytes(byte[] publicKey, byte[] plainBytes, byte[] signedBytes,
-            RsaSignerAlgorithm algorithm = RsaSignerAlgorithm.SHA1withRSA)
+        internal static bool VerifyFromBytes(byte[] publicKey, byte[] plainBytes, byte[] signedBytes, RsaSignerAlgorithm algorithm)
         {
             var privateKeyInfo = PublicKeyFactory.CreateKey(publicKey);
             string signAlgorithm = GetAlgorithm(algorithm);
@@ -594,22 +635,6 @@ namespace OpenSsl.Crypto.Utility
         }
 
         /// <summary>
-        /// 签名(十六进制)
-        /// </summary>
-        /// <param name="privateKey">私钥base64</param>
-        /// <param name="plainText">待签名字节</param>
-        /// <param name="algorithm">算法名称</param>
-        /// <returns></returns>
-        public static string SignToHex(string privateKey, string plainText,
-            RsaSignerAlgorithm algorithm = RsaSignerAlgorithm.SHA1withRSA)
-        {
-            var privateKeyBytes = Convert.FromBase64String(privateKey);
-            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-            byte[] signBytes = SignToBytes(privateKeyBytes, plainBytes, algorithm);
-            return Hex.ToHexString(signBytes);
-        }
-
-        /// <summary>
         /// 验签(十六进制)
         /// </summary>
         /// <param name="publicKey">公钥base64</param>
@@ -617,29 +642,12 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="signedHex">已签名字符</param>
         /// <param name="algorithm">签名算法</param>
         /// <returns></returns>
-        public static bool VerifyFromHex(string publicKey, string plainText, string signedHex,
-            RsaSignerAlgorithm algorithm = RsaSignerAlgorithm.SHA1withRSA)
+        internal static bool VerifyFromHex(string publicKey, string plainText, string signedHex, RsaSignerAlgorithm algorithm)
         {
             byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] signedBytes = Hex.Decode(signedHex);
             return VerifyFromBytes(publicKeyBytes, plainBytes, signedBytes, algorithm);
-        }
-
-        /// <summary>
-        /// 签名(Base64)
-        /// </summary>
-        /// <param name="privateKey">私钥base64</param>
-        /// <param name="plainText">待签名字节</param>
-        /// <param name="algorithm">算法名称</param>
-        /// <returns></returns>
-        public static string SignToBase64(string privateKey, string plainText,
-            RsaSignerAlgorithm algorithm = RsaSignerAlgorithm.SHA1withRSA)
-        {
-            var privateKeyBytes = Convert.FromBase64String(privateKey);
-            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-            byte[] signBytes = SignToBytes(privateKeyBytes, plainBytes, algorithm);
-            return Convert.ToBase64String(signBytes);
         }
 
         /// <summary>
@@ -650,14 +658,15 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="signedHex">已签名字符</param>
         /// <param name="algorithm">签名算法</param>
         /// <returns></returns>
-        public static bool VerifyFromBase64(string publicKey, string plainText, string signedHex,
-            RsaSignerAlgorithm algorithm = RsaSignerAlgorithm.SHA1withRSA)
+        internal static bool VerifyFromBase64(string publicKey, string plainText, string signedHex, RsaSignerAlgorithm algorithm)
         {
             byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] signedBytes = Convert.FromBase64String(signedHex);
             return VerifyFromBytes(publicKeyBytes, plainBytes, signedBytes, algorithm);
         }
+
+        #endregion
 
         /// <summary>
         /// 获取签名
@@ -691,23 +700,5 @@ namespace OpenSsl.Crypto.Utility
                 [RsaSignerAlgorithm.RIPEMD128withRSA] = "RIPEMD128withRSA",
                 [RsaSignerAlgorithm.RIPEMD160withRSA] = "RIPEMD160withRSA"
             };
-    }
-
-    /// <summary>
-    /// ras签名算法，其中MD2、MD5、SHA1密钥长度1024，其他密钥长度2048
-    /// </summary>
-    public enum RsaSignerAlgorithm
-    {
-        MD2withRSA = 1,
-        MD5withRSA = 2,
-        SHA1withRSA = 3,
-
-        //以下密钥长度均为2048
-        SHA224withRSA = 4,
-        SHA256withRSA = 5,
-        SHA384withRSA = 6,
-        SHA512withRSA = 7,
-        RIPEMD128withRSA = 8,
-        RIPEMD160withRSA = 9
     }
 }
