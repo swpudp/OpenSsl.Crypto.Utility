@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenSsl.Crypto.Utility;
-using System;
+﻿using System;
 using System.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenSsl.Crypto.Utility;
 
 namespace UnitTests
 {
@@ -20,12 +20,14 @@ namespace UnitTests
             string secret = "ZWNyOC00MjAhLWFmNjEtMzAhYTYxZDEhMWV2MC42NjP2MjA0NDY3NDU5MjgwLjk4";
             string content = "123456";
             string key = DigestUtils.Md5(secret, Encoding.UTF8);
-            string sm4 = CryptoUtils.Sm4EncryptToHex(key, content, CipherMode.ECB, CipherPadding.PKCS1);
-            Console.WriteLine(sm4);
-            Console.WriteLine(sm4.Length);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.ECB, CipherPadding.PKCS1);
+            //hex
+            string sm4Cipher = HexUtils.ToHexString(cipherBytes);
+            Console.WriteLine(sm4Cipher);
+            Console.WriteLine(sm4Cipher.Length);
             //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
             //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
-            string plain = CryptoUtils.Sm4DecryptFromHex(key, sm4, CipherMode.ECB, CipherPadding.PKCS1);
+            string plain = CryptoUtils.Sm4Decrypt(key, HexUtils.ToByteArray(sm4Cipher), CipherMode.ECB, CipherPadding.PKCS1);
             Assert.AreEqual(content, plain);
         }
 
@@ -38,12 +40,13 @@ namespace UnitTests
             string secret = "ZWNyOC00MjAhLWFmNjEtMzAhYTYxZDEhMWV2MC42NjP2MjA0NDY3NDU5MjgwLjk4";
             string content = "123456";
             string key = DigestUtils.Md5(secret, Encoding.UTF8);
-            string sm4 = CryptoUtils.Sm4EncryptToHex(key, content, CipherMode.ECB, CipherPadding.PKCS5);
-            Console.WriteLine(sm4);
-            Console.WriteLine(sm4.Length);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.ECB, CipherPadding.PKCS5);
+            string sm4Cipher = HexUtils.ToHexString(cipherBytes);
+            Console.WriteLine(sm4Cipher);
+            Console.WriteLine(sm4Cipher.Length);
             //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
             //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
-            string plain = CryptoUtils.Sm4DecryptFromHex(key, sm4, CipherMode.ECB, CipherPadding.PKCS5);
+            string plain = CryptoUtils.Sm4Decrypt(key, HexUtils.ToByteArray(sm4Cipher), CipherMode.ECB, CipherPadding.PKCS5);
             Assert.AreEqual(content, plain);
         }
 
@@ -56,10 +59,11 @@ namespace UnitTests
             string secret = "ZWNyOC00MjAhLWFmNjEtMzAhYTYxZDEhMWV2MC42NjP2MjA0NDY3NDU5MjgwLjk4";
             string content = "123456";
             string key = DigestUtils.Md5(secret, Encoding.UTF8);
-            string sm4 = CryptoUtils.Sm4EncryptToHex(key, content, CipherMode.ECB, CipherPadding.PKCS7);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.ECB, CipherPadding.PKCS7);
+            string sm4 = HexUtils.ToHexString(cipherBytes);
             //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
             //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
-            string plain = CryptoUtils.Sm4DecryptFromHex(key, sm4, CipherMode.ECB, CipherPadding.PKCS7);
+            string plain = CryptoUtils.Sm4Decrypt(key, HexUtils.ToByteArray(sm4), CipherMode.ECB, CipherPadding.PKCS7);
             Assert.AreEqual(content, plain);
         }
 
@@ -75,10 +79,11 @@ namespace UnitTests
             string key = DigestUtils.Md5(secret, Encoding.UTF8);
 
             //使用NoPadding模式，需要保证字符串长度是16的倍数
-            string sm4 = CryptoUtils.Sm4EncryptToHex(key, content, CipherMode.ECB, CipherPadding.NONE);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.ECB, CipherPadding.NONE);
+            string sm4 = HexUtils.ToHexString(cipherBytes);
             //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
             //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
-            string plain = CryptoUtils.Sm4DecryptFromHex(key, sm4, CipherMode.ECB, CipherPadding.NONE);
+            string plain = CryptoUtils.Sm4Decrypt(key, HexUtils.ToByteArray(sm4), CipherMode.ECB, CipherPadding.NONE);
             Assert.AreEqual(content, plain);
         }
 
@@ -93,10 +98,11 @@ namespace UnitTests
             string key = DigestUtils.Md5(secret, Encoding.UTF8);
             string iv = "0123456789ABCDEF";
             byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
-            string sm4 = CryptoUtils.Sm4EncryptToHex(key, content, CipherMode.CBC, CipherPadding.PKCS1, ivBytes);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.CBC, CipherPadding.PKCS1, ivBytes);
+            string sm4 = HexUtils.ToHexString(cipherBytes);
             //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
             //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
-            string plain = CryptoUtils.Sm4DecryptFromHex(key, sm4, CipherMode.CBC, CipherPadding.PKCS1, ivBytes);
+            string plain = CryptoUtils.Sm4Decrypt(key, HexUtils.ToByteArray(sm4), CipherMode.CBC, CipherPadding.PKCS1, ivBytes);
             Assert.AreEqual(content, plain);
         }
 
@@ -111,10 +117,11 @@ namespace UnitTests
             string key = DigestUtils.Md5(secret, Encoding.UTF8);
             string iv = "0123456789ABCDEF";
             byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
-            string sm4 = CryptoUtils.Sm4EncryptToHex(key, content, CipherMode.CBC, CipherPadding.PKCS5, ivBytes);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.CBC, CipherPadding.PKCS5, ivBytes);
+            string sm4 = HexUtils.ToHexString(cipherBytes);
             //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
             //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
-            string plain = CryptoUtils.Sm4DecryptFromHex(key, sm4, CipherMode.CBC, CipherPadding.PKCS5, ivBytes);
+            string plain = CryptoUtils.Sm4Decrypt(key, HexUtils.ToByteArray(sm4), CipherMode.CBC, CipherPadding.PKCS5, ivBytes);
             Assert.AreEqual(content, plain);
         }
 
@@ -129,10 +136,11 @@ namespace UnitTests
             string key = DigestUtils.Md5(secret, Encoding.UTF8);
             string iv = "0123456789ABCDEF";
             byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
-            string sm4 = CryptoUtils.Sm4EncryptToHex(key, content, CipherMode.CBC, CipherPadding.PKCS7, ivBytes);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.CBC, CipherPadding.PKCS7, ivBytes);
+            string sm4 = HexUtils.ToHexString(cipherBytes);
             //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
             //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
-            string plain = CryptoUtils.Sm4DecryptFromHex(key, sm4, CipherMode.CBC, CipherPadding.PKCS7, ivBytes);
+            string plain = CryptoUtils.Sm4Decrypt(key, HexUtils.ToByteArray(sm4), CipherMode.CBC, CipherPadding.PKCS7, ivBytes);
             Assert.AreEqual(content, plain);
         }
 
@@ -150,11 +158,12 @@ namespace UnitTests
             byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
 
             //使用NoPadding模式，需要保证字符串长度是16的倍数
-            string sm4 = CryptoUtils.Sm4EncryptToHex(key, content, CipherMode.CBC, CipherPadding.NONE, ivBytes);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.CBC, CipherPadding.NONE, ivBytes);
+            string sm4 = HexUtils.ToHexString(cipherBytes);
 
             //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
             //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
-            string plain = CryptoUtils.Sm4DecryptFromHex(key, sm4, CipherMode.CBC, CipherPadding.NONE, ivBytes);
+            string plain = CryptoUtils.Sm4Decrypt(key, HexUtils.ToByteArray(sm4), CipherMode.CBC, CipherPadding.NONE, ivBytes);
             Assert.AreEqual(content, plain);
         }
 
@@ -172,13 +181,13 @@ namespace UnitTests
             byte[] ivBytes = Encoding.UTF8.GetBytes(iv);
 
             //使用NoPadding模式，需要保证字符串长度是16的倍数
-            byte[] cipherBytes = CryptoUtils.Sm4EncryptToBytes(key, Encoding.UTF8.GetBytes(content), CipherMode.CBC, CipherPadding.NONE, ivBytes);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.CBC, CipherPadding.NONE, ivBytes);
             string cipher = SimpleCoder.EncodeBytes(cipherBytes);
 
             //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
             //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
             byte[] cihperDecodeBytes = SimpleCoder.DecodeBytes(cipher);
-            string plain = CryptoUtils.Sm4DecryptFromBytes(key, cihperDecodeBytes, CipherMode.CBC, CipherPadding.NONE, ivBytes);
+            string plain = CryptoUtils.Sm4Decrypt(key, cihperDecodeBytes, CipherMode.CBC, CipherPadding.NONE, ivBytes);
 
             Assert.AreEqual(content, plain);
         }
@@ -192,7 +201,7 @@ namespace UnitTests
             string secret = "00827f1b4065725790d22f1dfcdf2c220b607ab07a1aa41e62db3bf613a0fba6fb";
             string content = "1234567812345678";
             string key = DigestUtils.Md5(secret, Encoding.UTF8);
-            byte[] cipherBytes = CryptoUtils.Sm4EncryptToBytes(key, Encoding.UTF8.GetBytes(content), CipherMode.ECB, CipherPadding.PKCS7);
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, content, CipherMode.ECB, CipherPadding.PKCS7);
             string cipher = SimpleCoder.EncodeBytes(cipherBytes);
             Console.WriteLine(cipher);
             Assert.IsNotNull(cipher);
@@ -209,7 +218,7 @@ namespace UnitTests
             string cipcher = "OWZjNzM0ZGE3ZmRjOGU1YTc3ZjAyMGQ1NDEzZjZhNDYzMTAwMjlmY2FmOThhOTFlMmQwM2QwYjY3OTM3ZmY3MA==";
             byte[] cipherBytes = SimpleCoder.DecodeBytes(cipcher);
             string key = DigestUtils.Md5(secret, Encoding.UTF8);
-            string plainText = CryptoUtils.Sm4DecryptFromBytes(key, cipherBytes, CipherMode.ECB, CipherPadding.PKCS7);
+            string plainText = CryptoUtils.Sm4Decrypt(key, cipherBytes, CipherMode.ECB, CipherPadding.PKCS7);
             Assert.AreEqual(content, plainText);
         }
 
@@ -246,9 +255,10 @@ namespace UnitTests
         private static void KeyPairVerify(CipherKeyPair cipherKeyPair)
         {
             string content = Guid.NewGuid().ToString();
-            string sign = SignatureUtils.Sm2SignToBase64(cipherKeyPair.Private, content);
+            byte[] signBytes = SignatureUtils.Sm2Sign(cipherKeyPair.Private, content);
+            string sign = HexUtils.ToHexString(signBytes);
             Console.WriteLine("KeyPairVerify->sign：" + sign);
-            bool isSuccess = SignatureUtils.Sm2VerifyFromBase64(content, cipherKeyPair.Public, sign);
+            bool isSuccess = SignatureUtils.Sm2Verify(cipherKeyPair.Public, content, HexUtils.ToByteArray(sign));
             Assert.AreEqual(true, isSuccess);
         }
     }

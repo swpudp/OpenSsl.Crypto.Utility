@@ -7,7 +7,7 @@ namespace OpenSsl.Crypto.Utility
         /// <summary>
         /// 加密模式
         /// </summary>
-        private static readonly Dictionary<CipherMode, string> RsaCipcherModes = new Dictionary<CipherMode, string>
+        private static readonly Dictionary<CipherMode, string> RsaCipherModes = new Dictionary<CipherMode, string>
         {
             [CipherMode.NONE] = "NONE",
             [CipherMode.ECB] = "ECB",
@@ -53,12 +53,13 @@ namespace OpenSsl.Crypto.Utility
         /// <summary>
         /// 获取加密算法名称
         /// </summary>
-        /// <param name="cipcherMode"></param>
+        /// <param name="algorithmName"></param>
+        /// <param name="cipherMode"></param>
         /// <param name="padding"></param>
         /// <returns></returns>
-        internal static string GetCipherAlgorithm(string algorithmName, CipherMode cipcherMode, CipherPadding padding)
+        internal static string GetCipherAlgorithm(string algorithmName, CipherMode cipherMode, CipherPadding padding)
         {
-            return $"{algorithmName}/{GetCipherMode(cipcherMode)}/{GetCipherPadding(padding)}";
+            return $"{algorithmName}/{GetCipherMode(cipherMode)}/{GetCipherPadding(padding)}";
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace OpenSsl.Crypto.Utility
         /// <exception cref="System.NotSupportedException"></exception>
         private static string GetCipherMode(CipherMode cipherMode)
         {
-            return RsaCipcherModes.TryGetValue(cipherMode, out var cipher) ? cipher : throw new System.NotSupportedException(nameof(cipherMode));
+            return RsaCipherModes.TryGetValue(cipherMode, out var cipher) ? cipher : throw new System.NotSupportedException(nameof(cipherMode));
         }
 
         /// <summary>

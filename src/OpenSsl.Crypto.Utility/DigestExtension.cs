@@ -1,6 +1,6 @@
-﻿using Org.BouncyCastle.Crypto;
+﻿using System.Text;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
-using System.Text;
 
 namespace OpenSsl.Crypto.Utility
 {
@@ -25,6 +25,20 @@ namespace OpenSsl.Crypto.Utility
         /// <summary>
         /// 计算Hash字节
         /// </summary>
+        /// <param name="digest"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        internal static byte[] ComputeHashBytes(this IDigest digest, byte[] data)
+        {
+            var hashBytes = new byte[digest.GetDigestSize()];
+            digest.BlockUpdate(data, 0, data.Length);
+            digest.DoFinal(hashBytes, 0);
+            return hashBytes;
+        }
+
+        /// <summary>
+        /// 计算Hash字节
+        /// </summary>
         /// <param name="hmac"></param>
         /// <param name="data"></param>
         /// <param name="encoding"></param>
@@ -34,6 +48,22 @@ namespace OpenSsl.Crypto.Utility
             byte[] m = encoding.GetBytes(data);
             hmac.Init(new KeyParameter(encoding.GetBytes(key)));
             hmac.BlockUpdate(m, 0, m.Length);
+            byte[] resBuf = new byte[hmac.GetMacSize()];
+            hmac.DoFinal(resBuf, 0);
+            return resBuf;
+        }
+
+        /// <summary>
+        /// 计算Hash字节
+        /// </summary>
+        /// <param name="hmac"></param>
+        /// <param name="data"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        internal static byte[] ComputeHashBytes(this IMac hmac, string key, byte[] data, Encoding encoding)
+        {
+            hmac.Init(new KeyParameter(encoding.GetBytes(key)));
+            hmac.BlockUpdate(data, 0, data.Length);
             byte[] resBuf = new byte[hmac.GetMacSize()];
             hmac.DoFinal(resBuf, 0);
             return resBuf;

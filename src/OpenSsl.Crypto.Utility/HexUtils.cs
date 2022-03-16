@@ -5,23 +5,13 @@ namespace OpenSsl.Crypto.Utility
     public static class HexUtils
     {
         /// <summary>
-        /// 解密十六进制字符串
+        /// 十六进制字符串转字节数组
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="hexValue"></param>
         /// <returns></returns>
-        public static byte[] DecodeHex(string value)
+        public static byte[] ToByteArray(string hexValue)
         {
-            return Hex.Decode(value);
-        }
-
-        /// <summary>
-        /// 解密字节数组
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static byte[] DecodeBytes(byte[] value)
-        {
-            return Hex.Decode(value);
+            return Hex.Decode(hexValue);
         }
 
         /// <summary>
@@ -32,6 +22,17 @@ namespace OpenSsl.Crypto.Utility
         public static string ToHexString(byte[] data)
         {
             return Hex.ToHexString(data);
+        }
+
+        /// <summary>
+        /// 对字节数据进行编码
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <remarks>返回长度为原来2倍</remarks>
+        public static byte[] EncodeByteArray(byte[] value)
+        {
+            return Hex.Encode(value);
         }
     }
 }

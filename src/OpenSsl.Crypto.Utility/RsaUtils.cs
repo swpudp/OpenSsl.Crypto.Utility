@@ -1,4 +1,10 @@
-﻿using Org.BouncyCastle.Asn1;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Asn1.X9;
@@ -13,12 +19,6 @@ using Org.BouncyCastle.Utilities.Encoders;
 using Org.BouncyCastle.Utilities.IO.Pem;
 using Org.BouncyCastle.X509;
 using Org.BouncyCastle.X509.Extension;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
 
 namespace OpenSsl.Crypto.Utility
 {
@@ -34,8 +34,7 @@ namespace OpenSsl.Crypto.Utility
         private static AsymmetricCipherKeyPair GenerateKeyPair(int strength)
         {
             RsaKeyPairGenerator rsaKeyPairGenerator = new RsaKeyPairGenerator();
-            KeyGenerationParameters rsaKeyGenerationParameters =
-                new KeyGenerationParameters(new SecureRandom(), strength);
+            KeyGenerationParameters rsaKeyGenerationParameters = new KeyGenerationParameters(new SecureRandom(), strength);
             //初始化参数  
             rsaKeyPairGenerator.Init(rsaKeyGenerationParameters);
             return rsaKeyPairGenerator.GenerateKeyPair();
@@ -49,7 +48,7 @@ namespace OpenSsl.Crypto.Utility
         public static CipherKeyPair CreateCipherKeyPair(int length = 1024)
         {
             AsymmetricCipherKeyPair cipherKeyPair = GenerateKeyPair(length);
-            return new CipherKeyPair { Private = GetPrivateKey(cipherKeyPair.Private), Public = GetPublicKey(cipherKeyPair.Public) };
+            return new CipherKeyPair {Private = GetPrivateKey(cipherKeyPair.Private), Public = GetPublicKey(cipherKeyPair.Public)};
         }
 
         /// <summary>
@@ -72,6 +71,7 @@ namespace OpenSsl.Crypto.Utility
                     return GetPrivateKey(keyEntry.Key);
                 }
             }
+
             throw new Exception("读取证书出错");
         }
 
@@ -88,6 +88,7 @@ namespace OpenSsl.Crypto.Utility
             {
                 keystore.Load(stream, password.ToCharArray());
             }
+
             IEnumerable<string> aliases = keystore.Aliases.OfType<string>();
             foreach (var item in aliases)
             {
@@ -97,6 +98,7 @@ namespace OpenSsl.Crypto.Utility
                     return GetPublicKey(x509Certificate.GetPublicKey());
                 }
             }
+
             throw new Exception("读取证书出错");
         }
 
@@ -107,8 +109,7 @@ namespace OpenSsl.Crypto.Utility
         /// <returns></returns>
         private static string GetPublicKey(AsymmetricKeyParameter keyParameter)
         {
-            SubjectPublicKeyInfo subjectPublicKeyInfo =
-                SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keyParameter);
+            SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keyParameter);
             Asn1Object asn1ObjectPublic = subjectPublicKeyInfo.ToAsn1Object();
             byte[] publicInfoByte = asn1ObjectPublic.GetEncoded();
             return Convert.ToBase64String(publicInfoByte);
@@ -167,8 +168,7 @@ namespace OpenSsl.Crypto.Utility
         public static CipherKeyPair CreatePemCipherKeyPair(int length = 1024)
         {
             AsymmetricCipherKeyPair cipherKeyPair = GenerateKeyPair(length);
-            return new CipherKeyPair
-            { Private = GetPemPrivateKey(cipherKeyPair.Private), Public = GetPemPublicKey(cipherKeyPair.Public) };
+            return new CipherKeyPair {Private = GetPemPrivateKey(cipherKeyPair.Private), Public = GetPemPublicKey(cipherKeyPair.Public)};
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace OpenSsl.Crypto.Utility
         {
             using (TextReader reader = new StreamReader(pemPath))
             {
-                AsymmetricCipherKeyPair privateKeyParameter = (AsymmetricCipherKeyPair)new Org.BouncyCastle.OpenSsl.PemReader(reader).ReadObject();
+                AsymmetricCipherKeyPair privateKeyParameter = (AsymmetricCipherKeyPair) new Org.BouncyCastle.OpenSsl.PemReader(reader).ReadObject();
                 PrivateKeyInfo privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKeyParameter.Private);
                 Asn1Object asn1ObjectPrivate = privateKeyInfo.ToAsn1Object();
                 byte[] privateInfoByte = asn1ObjectPrivate.GetEncoded();
@@ -237,14 +237,14 @@ namespace OpenSsl.Crypto.Utility
             if (pem.Type.EndsWith("RSA PRIVATE KEY"))
             {
                 RsaPrivateKeyStructure rsa = RsaPrivateKeyStructure.GetInstance(pem.Content);
-                return new RsaPrivateCrtKeyParameters(rsa.Modulus, rsa.PublicExponent,
-                    rsa.PrivateExponent, rsa.Prime1, rsa.Prime2, rsa.Exponent1,
-                    rsa.Exponent2, rsa.Coefficient);
+                return new RsaPrivateCrtKeyParameters(rsa.Modulus, rsa.PublicExponent, rsa.PrivateExponent, rsa.Prime1, rsa.Prime2, rsa.Exponent1, rsa.Exponent2, rsa.Coefficient);
             }
+
             if (pem.Type.EndsWith("PRIVATE KEY"))
             {
                 return PrivateKeyFactory.CreateKey(pem.Content);
             }
+
             throw new ArgumentException("doesn't specify a valid private key", "resource");
         }
 
@@ -270,9 +270,8 @@ namespace OpenSsl.Crypto.Utility
         {
             using (TextReader reader = new StreamReader(pemPath))
             {
-                RsaKeyParameters publicKeyParameter = (RsaKeyParameters)new Org.BouncyCastle.OpenSsl.PemReader(reader).ReadObject();
-                SubjectPublicKeyInfo subjectPublicKeyInfo =
-                    SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(publicKeyParameter);
+                RsaKeyParameters publicKeyParameter = (RsaKeyParameters) new Org.BouncyCastle.OpenSsl.PemReader(reader).ReadObject();
+                SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(publicKeyParameter);
                 Asn1Object asn1ObjectPublic = subjectPublicKeyInfo.ToAsn1Object();
                 byte[] publicInfoByte = asn1ObjectPublic.GetEncoded();
                 return Convert.ToBase64String(publicInfoByte);
@@ -289,28 +288,11 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="cipherMode">加密模式</param>
         /// <param name="padding">填充方式</param>
         /// <returns>密文hex</returns>
-        internal static string EncryptToHex(string plainText, string publicKey, CipherMode cipherMode, CipherPadding padding)
+        internal static byte[] Encrypt(string publicKey, string plainText, CipherMode cipherMode, CipherPadding padding)
         {
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
-            byte[] result = EncryptToBytes(plainBytes, publicKeyBytes, cipherMode, padding);
-            return Hex.ToHexString(result);
-        }
-
-        /// <summary>
-        /// 加密
-        /// </summary>
-        /// <param name="plainText">明文</param>
-        /// <param name="publicKey">密钥</param>
-        /// <param name="cipherMode">加密模式</param>
-        /// <param name="padding">填充方式</param>
-        /// <returns>密文base64</returns>
-        internal static string EncryptToBase64(string plainText, string publicKey, CipherMode cipherMode, CipherPadding padding)
-        {
-            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-            byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
-            byte[] result = EncryptToBytes(plainBytes, publicKeyBytes, cipherMode, padding);
-            return Convert.ToBase64String(result);
+            return EncryptToBytes(publicKeyBytes, plainBytes, cipherMode, padding);
         }
 
         /// <summary>
@@ -321,7 +303,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="cipherMode">加密模式</param>
         /// <param name="padding">填充方式</param>
         /// <returns>密文字节数组</returns>
-        internal static byte[] EncryptToBytes(byte[] plainBytes, byte[] publicKeyBytes, CipherMode cipherMode, CipherPadding padding)
+        private static byte[] EncryptToBytes(byte[] publicKeyBytes, byte[] plainBytes, CipherMode cipherMode, CipherPadding padding)
         {
             string algorithm = AlgorithmUtils.GetCipherAlgorithm("RSA", cipherMode, padding);
             IBufferedCipher cipher = CipherUtilities.GetCipher(algorithm);
@@ -343,7 +325,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="cipherMode">加密模式</param>
         /// <param name="padding">填充方式</param>
         /// <returns>明文</returns>
-        internal static string DecryptFromBytes(byte[] cipherBytes, byte[] privateKeyBytes, CipherMode cipherMode, CipherPadding padding)
+        private static string DecryptFromBytes(byte[] privateKeyBytes, byte[] cipherBytes, CipherMode cipherMode, CipherPadding padding)
         {
             string algorithm = AlgorithmUtils.GetCipherAlgorithm("RSA", cipherMode, padding);
             IBufferedCipher cipher = CipherUtilities.GetCipher(algorithm);
@@ -356,31 +338,15 @@ namespace OpenSsl.Crypto.Utility
         /// <summary>
         /// 解密
         /// </summary>
-        /// <param name="cipherHex">密文hex</param>
+        /// <param name="cipherBytes">密文字节数组</param>
         /// <param name="privateKey">私钥</param>
         /// <param name="cipherMode">加密模式</param>
         /// <param name="padding">填充方式</param>
         /// <returns>明文</returns>
-        internal static string DecryptFromHex(string cipherHex, string privateKey, CipherMode cipherMode, CipherPadding padding)
+        internal static string Decrypt(string privateKey, byte[] cipherBytes, CipherMode cipherMode, CipherPadding padding)
         {
-            byte[] cipherBytes = Hex.Decode(cipherHex);
             byte[] privateBytes = Convert.FromBase64String(privateKey);
-            return DecryptFromBytes(cipherBytes, privateBytes, cipherMode, padding);
-        }
-
-        /// <summary>
-        /// 解密
-        /// </summary>
-        /// <param name="cipherBase64">密文base64</param>
-        /// <param name="privateKey">私钥</param>
-        /// <param name="cipherMode">加密模式</param>
-        /// <param name="padding">填充方式</param>
-        /// <returns>明文</returns>
-        internal static string DecryptFromBase64(string cipherBase64, string privateKey, CipherMode cipherMode, CipherPadding padding)
-        {
-            byte[] cipherBytes = Convert.FromBase64String(cipherBase64);
-            byte[] privateBytes = Convert.FromBase64String(privateKey);
-            return DecryptFromBytes(cipherBytes, privateBytes, cipherMode, padding);
+            return DecryptFromBytes(privateBytes, cipherBytes, cipherMode, padding);
         }
 
         #endregion
@@ -397,8 +363,7 @@ namespace OpenSsl.Crypto.Utility
         public static string GenerateBySelf(IList<string> domains, int keySizeBits, DateTime validFrom, DateTime validTo, out string caPrivateCert)
         {
             var keys = GenerateKeyPair(keySizeBits);
-            var cert = GenerateCertificate(domains, keys.Public, validFrom, validTo, domains.First(), null,
-                keys.Private, 1);
+            var cert = GenerateCertificate(domains, keys.Public, validFrom, validTo, domains.First(), null, keys.Private, 1);
             using (var priWriter = new StringWriter())
             {
                 var priPemWriter = new Org.BouncyCastle.OpenSsl.PemWriter(priWriter);
@@ -442,20 +407,19 @@ namespace OpenSsl.Crypto.Utility
             X509Certificate caCert;
             using (StreamReader pubReader = new StreamReader(caPublicCerPath, Encoding.UTF8))
             {
-                caCert = (X509Certificate)new Org.BouncyCastle.OpenSsl.PemReader(pubReader).ReadObject();
+                caCert = (X509Certificate) new Org.BouncyCastle.OpenSsl.PemReader(pubReader).ReadObject();
             }
 
             AsymmetricKeyParameter caPrivateKey;
             using (StreamReader priReader = new StreamReader(caPrivateKeyPath, Encoding.UTF8))
             {
                 Org.BouncyCastle.OpenSsl.PemReader reader = new Org.BouncyCastle.OpenSsl.PemReader(priReader);
-                caPrivateKey = ((AsymmetricCipherKeyPair)reader.ReadObject()).Private;
+                caPrivateKey = ((AsymmetricCipherKeyPair) reader.ReadObject()).Private;
             }
 
             string caSubjectName = GetSubjectName(caCert);
             AsymmetricCipherKeyPair keys = GenerateKeyPair(keySizeBits);
-            X509Certificate cert = GenerateCertificate(domains, keys.Public, validFrom, validTo, caSubjectName,
-                caCert.GetPublicKey(), caPrivateKey, null);
+            X509Certificate cert = GenerateCertificate(domains, keys.Public, validFrom, validTo, caSubjectName, caCert.GetPublicKey(), caPrivateKey, null);
             return GeneratePfx(cert, keys.Private, password);
         }
 
@@ -471,13 +435,9 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="issuerPrivate"></param>
         /// <param name="caPathLengthConstraint"></param>
         /// <returns></returns>
-        private static X509Certificate GenerateCertificate(IList<string> domains, AsymmetricKeyParameter subjectPublic,
-            DateTime validFrom, DateTime validTo, string issuerName, AsymmetricKeyParameter issuerPublic,
-            AsymmetricKeyParameter issuerPrivate, int? caPathLengthConstraint)
+        private static X509Certificate GenerateCertificate(IList<string> domains, AsymmetricKeyParameter subjectPublic, DateTime validFrom, DateTime validTo, string issuerName, AsymmetricKeyParameter issuerPublic, AsymmetricKeyParameter issuerPrivate, int? caPathLengthConstraint)
         {
-            Asn1SignatureFactory signatureFactory = issuerPrivate is ECPrivateKeyParameters
-                ? new Asn1SignatureFactory(X9ObjectIdentifiers.ECDsaWithSha256.ToString(), issuerPrivate)
-                : new Asn1SignatureFactory(PkcsObjectIdentifiers.Sha256WithRsaEncryption.ToString(), issuerPrivate);
+            Asn1SignatureFactory signatureFactory = issuerPrivate is ECPrivateKeyParameters ? new Asn1SignatureFactory(X9ObjectIdentifiers.ECDsaWithSha256.ToString(), issuerPrivate) : new Asn1SignatureFactory(PkcsObjectIdentifiers.Sha256WithRsaEncryption.ToString(), issuerPrivate);
 
             X509V3CertificateGenerator certGenerator = new X509V3CertificateGenerator();
             certGenerator.SetIssuerDN(new X509Name("CN=" + issuerName));
@@ -497,19 +457,16 @@ namespace OpenSsl.Crypto.Utility
             {
                 BasicConstraints basicConstraints = new BasicConstraints(caPathLengthConstraint.Value);
                 certGenerator.AddExtension(X509Extensions.BasicConstraints, true, basicConstraints);
-                certGenerator.AddExtension(X509Extensions.KeyUsage, false,
-                    new KeyUsage(KeyUsage.DigitalSignature | KeyUsage.CrlSign | KeyUsage.KeyCertSign));
+                certGenerator.AddExtension(X509Extensions.KeyUsage, false, new KeyUsage(KeyUsage.DigitalSignature | KeyUsage.CrlSign | KeyUsage.KeyCertSign));
             }
             else
             {
                 BasicConstraints basicConstraints = new BasicConstraints(cA: false);
                 certGenerator.AddExtension(X509Extensions.BasicConstraints, true, basicConstraints);
-                certGenerator.AddExtension(X509Extensions.KeyUsage, false,
-                    new KeyUsage(KeyUsage.DigitalSignature | KeyUsage.KeyEncipherment));
+                certGenerator.AddExtension(X509Extensions.KeyUsage, false, new KeyUsage(KeyUsage.DigitalSignature | KeyUsage.KeyEncipherment));
             }
 
-            certGenerator.AddExtension(X509Extensions.ExtendedKeyUsage, true,
-                new ExtendedKeyUsage(KeyPurposeID.IdKPServerAuth));
+            certGenerator.AddExtension(X509Extensions.ExtendedKeyUsage, true, new ExtendedKeyUsage(KeyPurposeID.IdKPServerAuth));
 
             GeneralName[] names = domains.Select(domain =>
             {
@@ -540,7 +497,7 @@ namespace OpenSsl.Crypto.Utility
             Pkcs12Store pkcs12Store = new Pkcs12Store();
             X509CertificateEntry certEntry = new X509CertificateEntry(cert);
             pkcs12Store.SetCertificateEntry(subject, certEntry);
-            pkcs12Store.SetKeyEntry(subject, new AsymmetricKeyEntry(privateKey), new[] { certEntry });
+            pkcs12Store.SetKeyEntry(subject, new AsymmetricKeyEntry(privateKey), new[] {certEntry});
             using (MemoryStream pfxStream = new MemoryStream())
             {
                 pkcs12Store.Save(pfxStream, password?.ToCharArray(), new SecureRandom());
@@ -560,6 +517,7 @@ namespace OpenSsl.Crypto.Utility
             {
                 subject = subject.Substring(3);
             }
+
             return subject;
         }
 
@@ -572,7 +530,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="plainBytes">待签名字节</param>
         /// <param name="algorithm">算法名称</param>
         /// <returns></returns>
-        internal static byte[] SignToBytes(byte[] privateKey, byte[] plainBytes, RsaSignerAlgorithm algorithm)
+        private static byte[] SignToBytes(byte[] privateKey, byte[] plainBytes, RsaSignerAlgorithm algorithm)
         {
             var privateKeyInfo = PrivateKeyFactory.CreateKey(privateKey);
             string signAlgorithm = GetAlgorithm(algorithm);
@@ -589,27 +547,12 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="plainText">待签名字节</param>
         /// <param name="algorithm">算法名称</param>
         /// <returns></returns>
-        internal static string SignToHex(string privateKey, string plainText, RsaSignerAlgorithm algorithm)
+        internal static byte[] Sign(string privateKey, string plainText, RsaSignerAlgorithm algorithm)
         {
             var privateKeyBytes = Convert.FromBase64String(privateKey);
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
             byte[] signBytes = SignToBytes(privateKeyBytes, plainBytes, algorithm);
-            return Hex.ToHexString(signBytes);
-        }
-
-        /// <summary>
-        /// 签名(Base64)
-        /// </summary>
-        /// <param name="privateKey">私钥base64</param>
-        /// <param name="plainText">待签名字节</param>
-        /// <param name="algorithm">算法名称</param>
-        /// <returns></returns>
-        internal static string SignToBase64(string privateKey, string plainText, RsaSignerAlgorithm algorithm)
-        {
-            var privateKeyBytes = Convert.FromBase64String(privateKey);
-            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-            byte[] signBytes = SignToBytes(privateKeyBytes, plainBytes, algorithm);
-            return Convert.ToBase64String(signBytes);
+            return signBytes;
         }
 
         #endregion
@@ -624,7 +567,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="signedBytes">已签名字节</param>
         /// <param name="algorithm">签名算法</param>
         /// <returns></returns>
-        internal static bool VerifyFromBytes(byte[] publicKey, byte[] plainBytes, byte[] signedBytes, RsaSignerAlgorithm algorithm)
+        private static bool VerifyFromBytes(byte[] publicKey, byte[] plainBytes, byte[] signedBytes, RsaSignerAlgorithm algorithm)
         {
             var privateKeyInfo = PublicKeyFactory.CreateKey(publicKey);
             string signAlgorithm = GetAlgorithm(algorithm);
@@ -635,35 +578,18 @@ namespace OpenSsl.Crypto.Utility
         }
 
         /// <summary>
-        /// 验签(十六进制)
+        /// 验签（Hex）
         /// </summary>
         /// <param name="publicKey">公钥base64</param>
-        /// <param name="plainText">待签名字符</param>
-        /// <param name="signedHex">已签名字符</param>
+        /// <param name="plainText">待签名内容</param>
+        /// <param name="signBytes">已签名字节数组</param>
         /// <param name="algorithm">签名算法</param>
         /// <returns></returns>
-        internal static bool VerifyFromHex(string publicKey, string plainText, string signedHex, RsaSignerAlgorithm algorithm)
+        internal static bool Verify(string publicKey, string plainText, byte[] signBytes, RsaSignerAlgorithm algorithm)
         {
             byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
             byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-            byte[] signedBytes = Hex.Decode(signedHex);
-            return VerifyFromBytes(publicKeyBytes, plainBytes, signedBytes, algorithm);
-        }
-
-        /// <summary>
-        /// 验签(Base64)
-        /// </summary>
-        /// <param name="publicKey">公钥base64</param>
-        /// <param name="plainText">待签名字符</param>
-        /// <param name="signedHex">已签名字符</param>
-        /// <param name="algorithm">签名算法</param>
-        /// <returns></returns>
-        internal static bool VerifyFromBase64(string publicKey, string plainText, string signedHex, RsaSignerAlgorithm algorithm)
-        {
-            byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
-            byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
-            byte[] signedBytes = Convert.FromBase64String(signedHex);
-            return VerifyFromBytes(publicKeyBytes, plainBytes, signedBytes, algorithm);
+            return VerifyFromBytes(publicKeyBytes, plainBytes, signBytes, algorithm);
         }
 
         #endregion
@@ -687,18 +613,17 @@ namespace OpenSsl.Crypto.Utility
         /// <summary>
         /// rsa签名算法
         /// </summary>
-        private static readonly IDictionary<RsaSignerAlgorithm, string> RsaSignerAlgorithms =
-            new Dictionary<RsaSignerAlgorithm, string>
-            {
-                [RsaSignerAlgorithm.MD2withRSA] = "MD2withRSA",
-                [RsaSignerAlgorithm.MD5withRSA] = "MD5withRSA",
-                [RsaSignerAlgorithm.SHA1withRSA] = "SHA1withRSA",
-                [RsaSignerAlgorithm.SHA224withRSA] = "SHA224withRSA",
-                [RsaSignerAlgorithm.SHA256withRSA] = "SHA256withRSA",
-                [RsaSignerAlgorithm.SHA384withRSA] = "SHA384withRSA",
-                [RsaSignerAlgorithm.SHA512withRSA] = "SHA512withRSA",
-                [RsaSignerAlgorithm.RIPEMD128withRSA] = "RIPEMD128withRSA",
-                [RsaSignerAlgorithm.RIPEMD160withRSA] = "RIPEMD160withRSA"
-            };
+        private static readonly IDictionary<RsaSignerAlgorithm, string> RsaSignerAlgorithms = new Dictionary<RsaSignerAlgorithm, string>
+        {
+            [RsaSignerAlgorithm.MD2withRSA] = "MD2withRSA",
+            [RsaSignerAlgorithm.MD5withRSA] = "MD5withRSA",
+            [RsaSignerAlgorithm.SHA1withRSA] = "SHA1withRSA",
+            [RsaSignerAlgorithm.SHA224withRSA] = "SHA224withRSA",
+            [RsaSignerAlgorithm.SHA256withRSA] = "SHA256withRSA",
+            [RsaSignerAlgorithm.SHA384withRSA] = "SHA384withRSA",
+            [RsaSignerAlgorithm.SHA512withRSA] = "SHA512withRSA",
+            [RsaSignerAlgorithm.RIPEMD128withRSA] = "RIPEMD128withRSA",
+            [RsaSignerAlgorithm.RIPEMD160withRSA] = "RIPEMD160withRSA"
+        };
     }
 }

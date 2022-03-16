@@ -28,7 +28,7 @@
     <None Update="Tls\public_key.pem">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Tls\VIPMRO_TEST.pfx">
+    <None Update="Tls\TEST.pfx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
