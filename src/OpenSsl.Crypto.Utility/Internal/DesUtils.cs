@@ -3,7 +3,7 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 
-namespace OpenSsl.Crypto.Utility
+namespace OpenSsl.Crypto.Utility.Internal
 {
     /// <summary>
     /// DES加密工具

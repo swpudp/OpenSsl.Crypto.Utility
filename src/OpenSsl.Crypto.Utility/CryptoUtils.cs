@@ -1,4 +1,6 @@
-﻿namespace OpenSsl.Crypto.Utility
+﻿using OpenSsl.Crypto.Utility.Internal;
+
+namespace OpenSsl.Crypto.Utility
 {
     /// <summary>
     /// 加密/解密工具

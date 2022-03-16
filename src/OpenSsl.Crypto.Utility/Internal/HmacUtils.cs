@@ -3,7 +3,7 @@ using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Macs;
 using Org.BouncyCastle.Utilities.Encoders;
 
-namespace OpenSsl.Crypto.Utility
+namespace OpenSsl.Crypto.Utility.Internal
 {
     /// <summary>
     /// HMAC辅助工具

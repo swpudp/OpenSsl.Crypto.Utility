@@ -2,7 +2,7 @@
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 
-namespace OpenSsl.Crypto.Utility
+namespace OpenSsl.Crypto.Utility.Internal
 {
     internal static class DigestExtension
     {

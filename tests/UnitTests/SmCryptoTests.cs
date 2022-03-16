@@ -228,7 +228,7 @@ namespace UnitTests
         [TestMethod]
         public void GenerateKeyPairCompressedPubKeyTest()
         {
-            var keyPair = SmUtils.GenerateKeyPair();
+            var keyPair = SmCertUtils.GenerateKeyPair();
             Console.WriteLine("sm2 Private:" + keyPair.Private);
             Console.WriteLine("sm2 Public:" + keyPair.Public);
             Assert.AreEqual(true, keyPair.Public.StartsWith("02") || keyPair.Public.StartsWith("03"));
@@ -241,7 +241,7 @@ namespace UnitTests
         [TestMethod]
         public void GenerateKeyPairNoCompressedPubKeyTest()
         {
-            var keyPair = SmUtils.GenerateKeyPair(false);
+            var keyPair = SmCertUtils.GenerateKeyPair(false);
             Console.WriteLine("sm2 Private:" + keyPair.Private);
             Console.WriteLine("sm2 Public:" + keyPair.Public);
             Assert.AreEqual(true, keyPair.Public.StartsWith("04"));

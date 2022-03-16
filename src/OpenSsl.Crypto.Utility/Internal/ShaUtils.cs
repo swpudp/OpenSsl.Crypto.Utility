@@ -2,7 +2,7 @@
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Utilities.Encoders;
 
-namespace OpenSsl.Crypto.Utility
+namespace OpenSsl.Crypto.Utility.Internal
 {
     internal static class ShaUtils
     {

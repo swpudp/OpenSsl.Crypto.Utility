@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OpenSsl.Crypto.Utility
+namespace OpenSsl.Crypto.Utility.Internal
 {
     internal static class AlgorithmUtils
     {

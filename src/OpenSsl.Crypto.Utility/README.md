@@ -1,7 +1,7 @@
-# OpenSsl.Crypto.Utility
+# YZ.Common.Crypto
 
 ### 一、简介
-`OpenSsl.Crypto.Utility`是一个基于开源项目`Portable.BouncyCastle`封装的加解密相关的类库。类库基于.Net Standard2.0开发，包含常用的摘要计算、数据签名、加密/解密等功能。
+`YZ.Common.Crypto`是一个基于开源项目`Portable.BouncyCastle`封装的加解密相关的类库。类库基于.Net Standard2.0开发，包含常用的摘要计算、数据签名、加密/解密等功能。
 
 ### 二、常用功能一览
 

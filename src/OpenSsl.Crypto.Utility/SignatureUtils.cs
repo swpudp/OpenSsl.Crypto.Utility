@@ -1,4 +1,6 @@
-﻿namespace OpenSsl.Crypto.Utility
+﻿using OpenSsl.Crypto.Utility.Internal;
+
+namespace OpenSsl.Crypto.Utility
 {
     /// <summary>
     /// 数据签名工具（非对称算法）

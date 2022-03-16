@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using OpenSsl.Crypto.Utility.Internal;
 
 namespace OpenSsl.Crypto.Utility
 {
