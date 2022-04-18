@@ -7,31 +7,26 @@ namespace OpenSsl.Crypto.Utility.Internal
     internal static class DigestExtension
     {
         /// <summary>
-        /// 计算Hash字节
+        /// 计数器ct
         /// </summary>
-        /// <param name="digest"></param>
-        /// <param name="data"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
-        internal static byte[] ComputeHashBytes(this IDigest digest, string data, Encoding encoding)
-        {
-            var hashBytes = new byte[digest.GetDigestSize()];
-            var bs = encoding.GetBytes(data);
-            digest.BlockUpdate(bs, 0, bs.Length);
-            digest.DoFinal(hashBytes, 0);
-            return hashBytes;
-        }
+        private static readonly byte[] Ct = {0, 0, 0, 1};
 
         /// <summary>
         /// 计算Hash字节
         /// </summary>
         /// <param name="digest"></param>
         /// <param name="data"></param>
+        /// <param name="forKdf"></param>
         /// <returns></returns>
-        internal static byte[] ComputeHashBytes(this IDigest digest, byte[] data)
+        internal static byte[] ComputeHashBytes(this IDigest digest, byte[] data, bool forKdf)
         {
             var hashBytes = new byte[digest.GetDigestSize()];
             digest.BlockUpdate(data, 0, data.Length);
+            if (forKdf)
+            {
+                digest.BlockUpdate(Ct, 0, Ct.Length);
+            }
+
             digest.DoFinal(hashBytes, 0);
             return hashBytes;
         }
@@ -40,6 +35,7 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// 计算Hash字节
         /// </summary>
         /// <param name="hmac"></param>
+        /// <param name="key"></param>
         /// <param name="data"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>
@@ -57,6 +53,7 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// 计算Hash字节
         /// </summary>
         /// <param name="hmac"></param>
+        /// <param name="key"></param>
         /// <param name="data"></param>
         /// <param name="encoding"></param>
         /// <returns></returns>

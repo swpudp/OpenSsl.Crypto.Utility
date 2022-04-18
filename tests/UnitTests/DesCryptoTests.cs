@@ -154,11 +154,6 @@ namespace UnitTests
             string hexCipher = HexUtils.ToHexString(cipherBytes);
             string webHexCipher = "49cc801e53d41f41";
             Assert.AreEqual(hexCipher, webHexCipher);
-
-            string cipher = SimpleCoder.EncodeBytes(cipherBytes);
-            Assert.IsNotNull(cipher);
-            //NDljYzgwMWU1M2Q0MWY0MQ==
-            System.Console.WriteLine(cipher);
         }
 
         /// <summary>
@@ -175,7 +170,7 @@ namespace UnitTests
             string iv = secretHex.Substring(24);
 
             string cipher = "NDljYzgwMWU1M2Q0MWY0MQ==";
-            byte[] cipherBytes = SimpleCoder.DecodeBytes(cipher);
+            byte[] cipherBytes = HexUtils.ToByteArray(cipher);
 
             byte[] keyBytes = encoding.GetBytes(key);
             byte[] ivBytes = encoding.GetBytes(iv);

@@ -25,12 +25,12 @@ namespace UnitTests
             Console.WriteLine("publicKey:" + keyPair.Public);
             Console.WriteLine("privateKey:" + keyPair.Private);
 
-            byte[] cipherBytes = CryptoUtils.RsaEncrypt(keyPair.Public, content, CipherMode.NONE, CipherPadding.NONE);
+            byte[] cipherBytes = CryptoUtils.RsaEncrypt(keyPair.Public, content, Encoding.UTF8, CipherMode.NONE, CipherPadding.NONE);
             //加密
             string cipher = Convert.ToBase64String(cipherBytes);
             Console.WriteLine("cipher:" + cipher);
             //解密
-            string plainText = CryptoUtils.RsaDecrypt(keyPair.Private, Convert.FromBase64String(cipher), CipherMode.NONE, CipherPadding.NONE);
+            string plainText = CryptoUtils.RsaDecrypt(keyPair.Private, Convert.FromBase64String(cipher), Encoding.UTF8, CipherMode.NONE, CipherPadding.NONE);
             Assert.AreEqual(content, plainText);
         }
 
@@ -45,11 +45,11 @@ namespace UnitTests
             Console.WriteLine("Public:" + keyPair.Public);
             Console.WriteLine("Private:" + keyPair.Private);
             //加密
-            byte[] cipherBytes = CryptoUtils.RsaEncrypt(keyPair.Public, content, CipherMode.NONE, CipherPadding.PKCS1);
+            byte[] cipherBytes = CryptoUtils.RsaEncrypt(keyPair.Public, content, Encoding.UTF8, CipherMode.NONE, CipherPadding.PKCS1);
             string cipher = Convert.ToBase64String(cipherBytes);
             Console.WriteLine("cipherPublic:" + cipher);
             //解密
-            string plainText = CryptoUtils.RsaDecrypt(keyPair.Private, Convert.FromBase64String(cipher), CipherMode.NONE, CipherPadding.PKCS1);
+            string plainText = CryptoUtils.RsaDecrypt(keyPair.Private, Convert.FromBase64String(cipher), Encoding.UTF8, CipherMode.NONE, CipherPadding.PKCS1);
             Assert.AreEqual(content, plainText);
         }
 
@@ -64,11 +64,11 @@ namespace UnitTests
             Console.WriteLine(keyPair.Public);
             Console.WriteLine(keyPair.Private);
             //加密
-            byte[] cipherBytes = CryptoUtils.RsaEncrypt(keyPair.Public, content, CipherMode.ECB, CipherPadding.PKCS1);
+            byte[] cipherBytes = CryptoUtils.RsaEncrypt(keyPair.Public, content, Encoding.UTF8, CipherMode.ECB, CipherPadding.PKCS1);
             string cipher = Convert.ToBase64String(cipherBytes);
             Console.WriteLine(cipher);
             //解密
-            string plainText = CryptoUtils.RsaDecrypt(keyPair.Private, Convert.FromBase64String(cipher), CipherMode.ECB, CipherPadding.PKCS1);
+            string plainText = CryptoUtils.RsaDecrypt(keyPair.Private, Convert.FromBase64String(cipher), Encoding.UTF8, CipherMode.ECB, CipherPadding.PKCS1);
             Assert.AreEqual(content, plainText);
         }
 
@@ -123,13 +123,13 @@ namespace UnitTests
             //加密
             string publicKeyPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Tls", "public_key.pem");
             var publicKey = RsaCertUtils.ReadPublicKey(publicKeyPath);
-            byte[] cipherBytes = CryptoUtils.RsaEncrypt(publicKey, content, CipherMode.NONE, CipherPadding.NONE);
+            byte[] cipherBytes = CryptoUtils.RsaEncrypt(publicKey, content, Encoding.UTF8, CipherMode.NONE, CipherPadding.NONE);
             string cipher = Convert.ToBase64String(cipherBytes);
 
             //解密
             string privateKeyPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Tls", "private_key.pem");
             var privateKey = RsaCertUtils.ReadPrivateKey(privateKeyPath);
-            string plainText = CryptoUtils.RsaDecrypt(privateKey, Convert.FromBase64String(cipher), CipherMode.NONE, CipherPadding.NONE);
+            string plainText = CryptoUtils.RsaDecrypt(privateKey, Convert.FromBase64String(cipher), Encoding.UTF8, CipherMode.NONE, CipherPadding.NONE);
             Assert.AreEqual(content, plainText);
         }
 
@@ -207,9 +207,9 @@ namespace UnitTests
             Assert.IsNotNull(publicKey);
 
             string content = Guid.NewGuid().ToString();
-            byte[] cipherBytes = CryptoUtils.RsaEncrypt(publicKey, content, CipherMode.NONE, CipherPadding.PKCS1);
+            byte[] cipherBytes = CryptoUtils.RsaEncrypt(publicKey, content, Encoding.UTF8, CipherMode.NONE, CipherPadding.PKCS1);
             string cipherBase64 = Convert.ToBase64String(cipherBytes);
-            string plainText = CryptoUtils.RsaDecrypt(privateKey, Convert.FromBase64String(cipherBase64), CipherMode.NONE, CipherPadding.PKCS1);
+            string plainText = CryptoUtils.RsaDecrypt(privateKey, Convert.FromBase64String(cipherBase64), Encoding.UTF8, CipherMode.NONE, CipherPadding.PKCS1);
             Assert.AreEqual(content, plainText);
         }
 
@@ -228,10 +228,12 @@ namespace UnitTests
         public void ReadPemPrivateKeyTest()
         {
             string privateKeyValue = "MIIEowIBAAKCAQEAwN7xTseqQs1pNA/+gTgXRqcxCYfkxDTsckfqf3O2ndsvJS5T8Fb0oHTyjy0HjrKLASWWUKfhQGXPHbo1FQd+0TyHxSza55+HtXquUq7QsAITHCu3U7aslvC7xe6/2E7nhu1TausF1nSyB1o4xVEjZyjrdQpTID0JvG8BtA5Yem9YDBCMZHBxvarQHVqdBsqo2G3M09qeUDbY3DuBgdiVAw0ApIM8mKGj4jsWmRSnypuxl40BjWAr6Xgk44MpSGHndhiFXGvfMRRYEd8Z30w32QlB+Gjk8rQwXnvxG8YCBPYqXVkqwld81bHFFz5zHQ0qekPhD8RrFimPn+RaD9VNfwIDAQABAoIBAQCxUUZQw0hJOkgqUToO2t6rWjK/LGyp5m4rcuqoWl3eKxDhAgKxx4AHtPz7nM6B5qvdVg0oAfAZIICWOAdtWgLBowC/yklHAWfm9O8nnQjHiGDBWX+mOx/ZdWFsy98cow5BAhfbCE/Jpme2UsA2yC3gPcKbS+64iOVWlEfgnf/CLte/dE0eAMfsp5wXpwv3ygA4wtyd2X2P+y6s+WYBKSvNMS08W4dsxwU9Q3AG3hS0Uab09qIPNS8tEMZ2L1tl0/VvkrAYjayM1CcKCrSnwtH6eJVi4WQxL1K3QxyxDKucsOlqSHg++4VMpGZNpvstn3IsY3PyCgfsODvHaoygvDBhAoGBAPxxdcI9stK9bIGSms0FqbVXYj8WmAjE/M9B7ECToWRQg65Gf8MYPyUSkY2mbDHwf+yPsUb5Oli+a2GW8BwmJWeXEIy0lQxa1TS2b7CN6XJtZVnjEgiZd7bXy/j69r/C4CMlfbrRWnUGftKr/U7ynaGs10/bISeW12E7WdLV5+kDAoGBAMOWnEzAFMPFzG9p/GtYpWU5jMNSiakzfm6n9Nwr7dFGnLhVGtO6act1bm/WB26NAgIEArhcitoKrI346nfkoZLXBpzzyJgFx4r31d1RN9Vsrt6AEywlwnLwHk2HXtCwmqrehZ4I741S2rHlaT8ifNwLyjW2sbw9QnpC3RL7R3rVAoGAOI/Dbs4cLxO6KB4NCTrnl3YI0VHiprRcYKPIp39sfel8V6P8JF5eZ5QNgMt1GotkXkCj298jr5aawLbs/aGeZ+N1FdGwQ6BmfPUTeV+SmszgFI/IDp00MYeQcCzq9HRZfAZ+cUlPF0FpURKwIuxBXWQ4qe/TMeeeQm7l5VOALrkCgYAljLa5LW9PHpxfD3P8j+pBAsl5flEbgN1XFTu3QV/I+8t+wCgEWheRjhwDsI2AteWayXZUOsAVmFMEdrNdDTHP5SRJ4auzM/jZPzd54+vaN6Fi6ifEJAOu2VaX/9M+MYmgIFR6wLBs62k9GhQYoOBjxoetxENfJkuq+UdEK6XPeQKBgFvf+SUrg7hFpRRyCq+DehdMQk1TJnEPTNLOalfrA/319KA8LGa0Q+ay5c2mDc9F//yAJEAT1WTEqHnvKBQvjofFAGRntoCT8anAnskSytwwpltKqDcpoKx/hVK+eVL47wuFroCBLGj0Zm3I7S+saGGmVllEky4jceE7IMTN7i6W";
-            string privateKey = RsaCertUtils.GetPrivateKeyFromPemContent(privateKeyValue, false);
+            string privateKeyBase64 = RsaCertUtils.GetPrivateKeyFromPemContent(privateKeyValue, false);
+            byte[] privateKey = Convert.FromBase64String(privateKeyBase64);
             string valueStr = "{\"request\":{\"body\":{\"ntbusmody\":[],\"ntecocsax1\":[{\"brneac\":\"755936046310201\",\"cstnam\":\"中建电子商务有限责任公司\",\"intacc\":\"755936046310903\",\"intflg\":\"N\",\"ntfurl\":\"http://118.113.15.111:8081/bank/cmb/transaction\",\"rcvchk\":\"Y\",\"shracc\":\"755936046310903\",\"shrnam\":\"银企直连专用测试企业279\",\"yurref\":\"20211126163904SSSSystem.Random\"}]},\"head\":{\"funcode\":\"NTECOCSA\",\"reqid\":\"20211126163904SSSSystem.Random\",\"userid\":\"N002986845\"},\"signature\":{\"sigdat\":\"\",\"sigtim\":\"20211126163904\"}},\"signature\":{\"sigdat\":\"__signature_sigdat__\",\"sigtim\":\"20211126165559\"}}";
+            byte[] valueStrBytes = Encoding.UTF8.GetBytes(valueStr);
             string sign = "Xvf89tMK65/336cRiuRcYWHU4igzF2jiuvtOUvoBwq8Ztt5HReF8GgOdOXVW6orE/hoqihL7QqUYD2RjnmxSj6lfNR5VOJogdKBE/4sTq+fjgEcZiud82YBaMetozLTyxuwHIYAiIAaO2ZmrPP1Puwfh2fEva7/ySeX182a+FRxhbtN6Xnw7echGAmgtAO0jOCawuaKitP6XV9eb2w1s+T56GGXvVDYtUIx9Y3OE6T0FA6VUR37cBggwofKiXKTR4pSQSW5udw4K361HNPGaTbcaowUTN1hrYSWx6xroplr7LrU5hGwjczTOfGFvPPGQ8Aix3EBgwpY2+rXf+bGDDA==";
-            string actualSign = Convert.ToBase64String(SignatureUtils.RsaSign(privateKey, valueStr, RsaSignerAlgorithm.SHA256withRSA));
+            string actualSign = Convert.ToBase64String(SignatureUtils.RsaSign(privateKey, valueStrBytes, RsaSignerAlgorithm.SHA256withRSA));
             Assert.AreEqual(sign, actualSign);
         }
 
@@ -298,8 +300,8 @@ namespace UnitTests
             Assert.AreEqual("ccbee7515574b9084cfce8f397aedec855c1359cf4a7aba6649a080883efb7b0", reqJsonHex);
 
             var publicKey = RsaCertUtils.GetPublicKeyFromPfx(@"Tls/TEST.pfx", "mcl1024#");
-            string cipher = Convert.ToBase64String(CryptoUtils.RsaEncrypt(publicKey, reqJsonHex, CipherMode.NONE, CipherPadding.PKCS1));
-            string actualReqJsonSign = CryptoUtils.RsaDecrypt(privateKey, Convert.FromBase64String(cipher), CipherMode.NONE, CipherPadding.PKCS1);
+            string cipher = Convert.ToBase64String(CryptoUtils.RsaEncrypt(publicKey, reqJsonHex, Encoding.UTF8, CipherMode.NONE, CipherPadding.PKCS1));
+            string actualReqJsonSign = CryptoUtils.RsaDecrypt(privateKey, Convert.FromBase64String(cipher), Encoding.UTF8, CipherMode.NONE, CipherPadding.PKCS1);
             Assert.AreEqual(reqJsonHex, actualReqJsonSign);
         }
 
@@ -311,27 +313,49 @@ namespace UnitTests
         {
             string privateKey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAO9ZxSM9SRCiyybIVvBYOXWDJtEieakJS4b7Qtt1jyPJliAICPbl0zNrvuhK8onC/y7q/S+Oq5Y8pbezC9Uglu0gqvgBj0UaCnQmXNZdkotefnJvdTZI6tgbCaPCxW9sXQJlHPjQSHR2B+dKRONPbdjYWACUwYERWGYzC/q0Y1uRAgMBAAECgYAPzG9Ilq8qc8cQsxuYogd/kV3FYyRVpdaVkniExNs4Y6zO8MjVXIaBd+SyL4mX0fEHF0gJVL5QXIYcZys/m6GVOlVCJPjr9AtcinHIpY6Yh2Zes4DWKayc0dQ9b3bB9ghWv/M8cIeJG8ac8My92Rf9+BXoCUEgC6uzBlC0JAxD0wJBAPuSYQclvYpW7UQWhZxEeH1ugeeXTsdKDm0PowjPnOggWVYJrdfD/G8Ei/g4AZptfw1fbploNLXsKs/w2zWyWv8CQQDzkFIehH//jSTf6HOcfa2uxpIoM39XF2c/gULlhkiXffAvau8jZ3uHtw/NjoPgyKjF4QoMFkeV5a+f1wy11RlvAkEA1l0w2IpMLClOHAqk5zdhBGC5yMGhmyd7i2sbnVJrfVCzTyEIRSb3XxIcwvHWS+SpspdzAr1MzQfkozO1VtgXuQJADKlxC3MZ8GAXDajY8ca6074w9PQQZ6eoz21Z2/LKLU33wY9OlUmY62pB4Q7KnlHwLDFRw2UZHZrOMYINgBpu8wJAQa/C7S/zKNIdqLNBSckJbH+W7zDFBSevGcPB1VesWjZ5wJcuJa6iMwXAq/ci2bOlMsZSbN0bnsEb+mWqQ21L5g==";
             string publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvWcUjPUkQossmyFbwWDl1gybRInmpCUuG+0LbdY8jyZYgCAj25dMza77oSvKJwv8u6v0vjquWPKW3swvVIJbtIKr4AY9FGgp0JlzWXZKLXn5yb3U2SOrYGwmjwsVvbF0CZRz40Eh0dgfnSkTjT23Y2FgAlMGBEVhmMwv6tGNbkQIDAQAB";
-            string conent = Guid.NewGuid().ToString();
-            string cipher = HexUtils.ToHexString(CryptoUtils.RsaEncrypt(publicKey, conent, CipherMode.NONE, CipherPadding.PKCS1));
-            string expected = CryptoUtils.RsaDecrypt(privateKey, HexUtils.ToByteArray(cipher), CipherMode.NONE, CipherPadding.PKCS1);
-            Assert.AreEqual(conent, expected);
+            string content = Guid.NewGuid().ToString();
+            string cipher = HexUtils.ToHexString(CryptoUtils.RsaEncrypt(publicKey, content, Encoding.UTF8, CipherMode.NONE, CipherPadding.PKCS1));
+            string expected = CryptoUtils.RsaDecrypt(privateKey, HexUtils.ToByteArray(cipher), Encoding.UTF8, CipherMode.NONE, CipherPadding.PKCS1);
+            Assert.AreEqual(content, expected);
         }
 
         /// <summary>
-        /// hex加密解密测试
+        /// 加密解密测试
         /// </summary>
         [TestMethod]
-        public void EncryptAndDecryptWithSimpleCoderTest()
+        public void EncryptAndDecryptWithBytesTest()
         {
-            string privateKey = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAO9ZxSM9SRCiyybIVvBYOXWDJtEieakJS4b7Qtt1jyPJliAICPbl0zNrvuhK8onC/y7q/S+Oq5Y8pbezC9Uglu0gqvgBj0UaCnQmXNZdkotefnJvdTZI6tgbCaPCxW9sXQJlHPjQSHR2B+dKRONPbdjYWACUwYERWGYzC/q0Y1uRAgMBAAECgYAPzG9Ilq8qc8cQsxuYogd/kV3FYyRVpdaVkniExNs4Y6zO8MjVXIaBd+SyL4mX0fEHF0gJVL5QXIYcZys/m6GVOlVCJPjr9AtcinHIpY6Yh2Zes4DWKayc0dQ9b3bB9ghWv/M8cIeJG8ac8My92Rf9+BXoCUEgC6uzBlC0JAxD0wJBAPuSYQclvYpW7UQWhZxEeH1ugeeXTsdKDm0PowjPnOggWVYJrdfD/G8Ei/g4AZptfw1fbploNLXsKs/w2zWyWv8CQQDzkFIehH//jSTf6HOcfa2uxpIoM39XF2c/gULlhkiXffAvau8jZ3uHtw/NjoPgyKjF4QoMFkeV5a+f1wy11RlvAkEA1l0w2IpMLClOHAqk5zdhBGC5yMGhmyd7i2sbnVJrfVCzTyEIRSb3XxIcwvHWS+SpspdzAr1MzQfkozO1VtgXuQJADKlxC3MZ8GAXDajY8ca6074w9PQQZ6eoz21Z2/LKLU33wY9OlUmY62pB4Q7KnlHwLDFRw2UZHZrOMYINgBpu8wJAQa/C7S/zKNIdqLNBSckJbH+W7zDFBSevGcPB1VesWjZ5wJcuJa6iMwXAq/ci2bOlMsZSbN0bnsEb+mWqQ21L5g==";
-            string publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvWcUjPUkQossmyFbwWDl1gybRInmpCUuG+0LbdY8jyZYgCAj25dMza77oSvKJwv8u6v0vjquWPKW3swvVIJbtIKr4AY9FGgp0JlzWXZKLXn5yb3U2SOrYGwmjwsVvbF0CZRz40Eh0dgfnSkTjT23Y2FgAlMGBEVhmMwv6tGNbkQIDAQAB";
-            string conent = Guid.NewGuid().ToString();
-            byte[] cipherBytes = CryptoUtils.RsaEncrypt(publicKey, conent, CipherMode.NONE, CipherPadding.PKCS1);
-            string cipher = SimpleCoder.EncodeBytes(cipherBytes);
+            string privateKeyBase64 = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAO9ZxSM9SRCiyybIVvBYOXWDJtEieakJS4b7Qtt1jyPJliAICPbl0zNrvuhK8onC/y7q/S+Oq5Y8pbezC9Uglu0gqvgBj0UaCnQmXNZdkotefnJvdTZI6tgbCaPCxW9sXQJlHPjQSHR2B+dKRONPbdjYWACUwYERWGYzC/q0Y1uRAgMBAAECgYAPzG9Ilq8qc8cQsxuYogd/kV3FYyRVpdaVkniExNs4Y6zO8MjVXIaBd+SyL4mX0fEHF0gJVL5QXIYcZys/m6GVOlVCJPjr9AtcinHIpY6Yh2Zes4DWKayc0dQ9b3bB9ghWv/M8cIeJG8ac8My92Rf9+BXoCUEgC6uzBlC0JAxD0wJBAPuSYQclvYpW7UQWhZxEeH1ugeeXTsdKDm0PowjPnOggWVYJrdfD/G8Ei/g4AZptfw1fbploNLXsKs/w2zWyWv8CQQDzkFIehH//jSTf6HOcfa2uxpIoM39XF2c/gULlhkiXffAvau8jZ3uHtw/NjoPgyKjF4QoMFkeV5a+f1wy11RlvAkEA1l0w2IpMLClOHAqk5zdhBGC5yMGhmyd7i2sbnVJrfVCzTyEIRSb3XxIcwvHWS+SpspdzAr1MzQfkozO1VtgXuQJADKlxC3MZ8GAXDajY8ca6074w9PQQZ6eoz21Z2/LKLU33wY9OlUmY62pB4Q7KnlHwLDFRw2UZHZrOMYINgBpu8wJAQa/C7S/zKNIdqLNBSckJbH+W7zDFBSevGcPB1VesWjZ5wJcuJa6iMwXAq/ci2bOlMsZSbN0bnsEb+mWqQ21L5g==";
+            string publicKeyBase64 = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvWcUjPUkQossmyFbwWDl1gybRInmpCUuG+0LbdY8jyZYgCAj25dMza77oSvKJwv8u6v0vjquWPKW3swvVIJbtIKr4AY9FGgp0JlzWXZKLXn5yb3U2SOrYGwmjwsVvbF0CZRz40Eh0dgfnSkTjT23Y2FgAlMGBEVhmMwv6tGNbkQIDAQAB";
+            byte[] content = Guid.NewGuid().ToByteArray();
+            byte[] publicKey = Convert.FromBase64String(publicKeyBase64);
+            byte[] privateKey = Convert.FromBase64String(privateKeyBase64);
 
-            byte[] cipherDecodedBytes = SimpleCoder.DecodeBytes(cipher);
-            string expected = CryptoUtils.RsaDecrypt(privateKey, cipherDecodedBytes, CipherMode.NONE, CipherPadding.PKCS1);
-            Assert.AreEqual(conent, expected);
+            byte[] cipherBytes = CryptoUtils.RsaEncrypt(publicKey, (content), CipherMode.NONE, CipherPadding.PKCS1);
+            string cipher = HexUtils.ToHexString(cipherBytes);
+
+            byte[] cipherBytes1 = HexUtils.ToByteArray(cipher);
+            Assert.IsTrue(ArrayEquals(cipherBytes, cipherBytes1));
+            byte[] expected = CryptoUtils.RsaDecrypt(privateKey, cipherBytes, CipherMode.NONE, CipherPadding.PKCS1);
+            Assert.IsTrue(ArrayEquals(content, expected));
+        }
+
+        private static bool ArrayEquals(byte[] a, byte[] b)
+        {
+            if (a.Length != b.Length)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

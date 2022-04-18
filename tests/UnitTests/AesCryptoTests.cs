@@ -64,8 +64,7 @@ namespace UnitTests
             string iv = secretHex.Substring(16);
             string content = "123456";
             byte[] cipherBytes = CryptoUtils.AesEncrypt(key, content, CipherMode.CBC, CipherPadding.PKCS5, iv);
-            string cipher = SimpleCoder.EncodeBytes(cipherBytes);
-
+            string cipher = HexUtils.ToHexString(cipherBytes);
             Assert.IsNotNull(cipher);
             Console.WriteLine("EncryptToBytes->cipher:" + cipher);
         }
@@ -120,7 +119,7 @@ namespace UnitTests
             string iv = secretHex.Substring(16);
 
             string cipher = "MDY2NjgyZDk5Y2NmYjlmNmQwMmExNjQ5NDNlMjUwYzA=";
-            byte[] cipherBytes = SimpleCoder.DecodeBytes(cipher);
+            byte[] cipherBytes = HexUtils.ToByteArray(cipher);
 
             string plainText = CryptoUtils.AesDecrypt(key, cipherBytes, CipherMode.CBC, CipherPadding.PKCS5, iv);
             string expected = "123456";

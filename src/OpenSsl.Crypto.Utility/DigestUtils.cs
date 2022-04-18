@@ -18,18 +18,17 @@ namespace OpenSsl.Crypto.Utility
         /// <returns>摘要</returns>
         public static string Sha1(string data, Encoding encoding)
         {
-            return ShaUtils.Sha1(data, encoding);
+            return HexUtils.ToHexString(ShaUtils.Sha1(encoding.GetBytes(data)));
         }
 
         /// <summary>
         /// sha1摘要
         /// </summary>
         /// <param name="data">待计算摘要内容</param>
-        /// <param name="encoding">编码</param>
         /// <returns>摘要</returns>
-        public static string Sha1(byte[] data, Encoding encoding)
+        public static byte[] Sha1(byte[] data)
         {
-            return ShaUtils.Sha1(data, encoding);
+            return ShaUtils.Sha1(data);
         }
 
         /// <summary>
@@ -40,18 +39,17 @@ namespace OpenSsl.Crypto.Utility
         /// <returns>摘要</returns>
         public static string Sha224(string data, Encoding encoding)
         {
-            return ShaUtils.Sha224(data, encoding);
+            return HexUtils.ToHexString(ShaUtils.Sha224(encoding.GetBytes(data)));
         }
 
         /// <summary>
         /// sha224摘要
         /// </summary>
         /// <param name="data">待计算摘要内容</param>
-        /// <param name="encoding">编码</param>
         /// <returns>摘要</returns>
-        public static string Sha224(byte[] data, Encoding encoding)
+        public static byte[] Sha224(byte[] data)
         {
-            return ShaUtils.Sha224(data, encoding);
+            return ShaUtils.Sha224(data);
         }
 
         /// <summary>
@@ -62,18 +60,17 @@ namespace OpenSsl.Crypto.Utility
         /// <returns>摘要</returns>
         public static string Sha256(string data, Encoding encoding)
         {
-            return ShaUtils.Sha256(data, encoding);
+            return HexUtils.ToHexString(ShaUtils.Sha256(encoding.GetBytes(data)));
         }
 
         /// <summary>
         /// sha256摘要
         /// </summary>
         /// <param name="data">待计算摘要内容</param>
-        /// <param name="encoding">编码</param>
         /// <returns>摘要</returns>
-        public static string Sha256(byte[] data, Encoding encoding)
+        public static byte[] Sha256(byte[] data)
         {
-            return ShaUtils.Sha256(data, encoding);
+            return ShaUtils.Sha256(data);
         }
 
         /// <summary>
@@ -84,18 +81,17 @@ namespace OpenSsl.Crypto.Utility
         /// <returns>摘要</returns>
         public static string Sha384(string data, Encoding encoding)
         {
-            return ShaUtils.Sha384(data, encoding);
+            return HexUtils.ToHexString(ShaUtils.Sha384(encoding.GetBytes(data)));
         }
 
         /// <summary>
         /// sha384摘要
         /// </summary>
         /// <param name="data">待计算摘要内容</param>
-        /// <param name="encoding">编码</param>
         /// <returns>摘要</returns>
-        public static string Sha384(byte[] data, Encoding encoding)
+        public static byte[] Sha384(byte[] data)
         {
-            return ShaUtils.Sha384(data, encoding);
+            return ShaUtils.Sha384(data);
         }
 
         /// <summary>
@@ -106,18 +102,17 @@ namespace OpenSsl.Crypto.Utility
         /// <returns>摘要</returns>
         public static string Sha512(string data, Encoding encoding)
         {
-            return ShaUtils.Sha512(data, encoding);
+            return HexUtils.ToHexString(ShaUtils.Sha512(encoding.GetBytes(data)));
         }
 
         /// <summary>
         /// sha512摘要
         /// </summary>
         /// <param name="data">待计算摘要内容</param>
-        /// <param name="encoding">编码</param>
         /// <returns>摘要</returns>
-        public static string Sha512(byte[] data, Encoding encoding)
+        public static byte[] Sha512(byte[] data)
         {
-            return ShaUtils.Sha512(data, encoding);
+            return ShaUtils.Sha512(data);
         }
 
         #endregion
@@ -274,18 +269,17 @@ namespace OpenSsl.Crypto.Utility
         /// <returns>摘要</returns>
         public static string Md5(string data, Encoding encoding)
         {
-            return Md5Utils.Digest(data, encoding);
+            return HexUtils.ToHexString(Md5Utils.Digest(encoding.GetBytes(data)));
         }
 
         /// <summary>
         /// md5计算摘要
         /// </summary>
         /// <param name="data">待计算摘要内容</param>
-        /// <param name="encoding">编码</param>
         /// <returns>摘要</returns>
-        public static string Md5(byte[] data, Encoding encoding)
+        public static byte[] Md5(byte[] data)
         {
-            return Md5Utils.Digest(data, encoding);
+            return Md5Utils.Digest(data);
         }
 
         #endregion
@@ -296,11 +290,11 @@ namespace OpenSsl.Crypto.Utility
         /// 国密SM3计算摘要
         /// </summary>
         /// <param name="data">待计算摘要内容</param>
-        /// <param name="encoding">编码</param>
+        /// <param name="forKdf">是否使用派生函数</param>
         /// <returns>摘要</returns>
-        public static string Sm3(string data, Encoding encoding)
+        public static byte[] Sm3(byte[] data, bool forKdf = false)
         {
-            return SmUtils.Digest(data, encoding);
+            return SmUtils.Digest(data, forKdf);
         }
 
         /// <summary>
@@ -308,10 +302,11 @@ namespace OpenSsl.Crypto.Utility
         /// </summary>
         /// <param name="data">待计算摘要内容</param>
         /// <param name="encoding">编码</param>
+        /// <param name="forKdf">是否使用派生函数</param>
         /// <returns>摘要</returns>
-        public static string Sm3(byte[] data, Encoding encoding)
+        public static string Sm3(string data, Encoding encoding, bool forKdf = false)
         {
-            return SmUtils.Digest(data, encoding);
+            return HexUtils.ToHexString(SmUtils.Digest(encoding.GetBytes(data), forKdf));
         }
 
         #endregion

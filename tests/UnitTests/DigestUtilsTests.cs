@@ -29,10 +29,12 @@ namespace UnitTests
         public void Md5BytesTest()
         {
             string content = "123456";
-            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
-            string cipher = DigestUtils.Md5(contentBytes, Encoding.UTF8);
+            string cipher = DigestUtils.Md5(content, Encoding.UTF8);
             string expect = "e10adc3949ba59abbe56e057f20f883e";
             Assert.AreEqual(expect, cipher);
+            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+            byte[] md5Bytes = DigestUtils.Md5(contentBytes);
+            Assert.AreEqual(cipher, HexUtils.ToHexString(md5Bytes));
         }
 
         /// <summary>
@@ -42,7 +44,8 @@ namespace UnitTests
         public void Sm3Test()
         {
             string content = "123456";
-            string sm3 = DigestUtils.Sm3(content, Encoding.UTF8);
+            byte[] data = Encoding.UTF8.GetBytes(content);
+            string sm3 = HexUtils.ToHexString(DigestUtils.Sm3(data, false));
             //使用gmssl验证
             //http://gmssl.org/docs/quickstart.html
             //执行命令 echo -n 123456 | gmssl dgst -sm3
@@ -57,8 +60,7 @@ namespace UnitTests
         public void Sm3BytesTest()
         {
             string content = "123456";
-            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
-            string sm3 = DigestUtils.Sm3(contentBytes, Encoding.UTF8);
+            string sm3 = DigestUtils.Sm3(content, Encoding.UTF8);
             //使用gmssl验证
             //http://gmssl.org/docs/quickstart.html
             //执行命令 echo -n 123456 | gmssl dgst -sm3
@@ -85,8 +87,7 @@ namespace UnitTests
         public void Sha1BytesTest()
         {
             string content = "123456";
-            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
-            string cipher = DigestUtils.Sha1(contentBytes, Encoding.UTF8);
+            string cipher = DigestUtils.Sha1(content, Encoding.UTF8);
             string expect = "7c4a8d09ca3762af61e59520943dc26494f8941b";
             Assert.AreEqual(expect, cipher);
         }
@@ -110,8 +111,7 @@ namespace UnitTests
         public void Sha224BytesTest()
         {
             string content = "123456";
-            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
-            string cipher = DigestUtils.Sha224(contentBytes, Encoding.UTF8);
+            string cipher = DigestUtils.Sha224(content, Encoding.UTF8);
             string expect = "f8cdb04495ded47615258f9dc6a3f4707fd2405434fefc3cbf4ef4e6";
             Assert.AreEqual(expect, cipher);
         }
@@ -135,8 +135,7 @@ namespace UnitTests
         public void Sha256BytesTest()
         {
             string content = "123456";
-            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
-            string cipher = DigestUtils.Sha256(contentBytes, Encoding.UTF8);
+            string cipher = DigestUtils.Sha256(content, Encoding.UTF8);
             string expect = "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92";
             Assert.AreEqual(expect, cipher);
         }
@@ -160,8 +159,7 @@ namespace UnitTests
         public void Sha384BytesTest()
         {
             string content = "123456";
-            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
-            string cipher = DigestUtils.Sha384(contentBytes, Encoding.UTF8);
+            string cipher = DigestUtils.Sha384(content, Encoding.UTF8);
             string expect = "0a989ebc4a77b56a6e2bb7b19d995d185ce44090c13e2984b7ecc6d446d4b61ea9991b76a4c2f04b1b4d244841449454";
             Assert.AreEqual(expect, cipher);
         }
@@ -185,8 +183,7 @@ namespace UnitTests
         public void Sha512BytesTest()
         {
             string content = "123456";
-            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
-            string cipher = DigestUtils.Sha512(contentBytes, Encoding.UTF8);
+            string cipher = DigestUtils.Sha512(content, Encoding.UTF8);
             string expect = "ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413";
             Assert.AreEqual(expect, cipher);
         }
