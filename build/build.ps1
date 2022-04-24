@@ -38,7 +38,7 @@ if ($RunTests) {
 if ($CreatePackages) {
 
     Write-Host "begin get latest version" -ForegroundColor "Green"
-    $Response = Invoke-WebRequest -URI "https://api-v2v3search-0.nuget.org/query?q=OfdSharp&prerelease=false&skip=0&take=1"
+    $Response = Invoke-WebRequest -URI "https://api-v2v3search-0.nuget.org/query?q=OpenSsl.Crypto.Utility&prerelease=false&skip=0&take=1"
     $json = $Response.Content | Out-String | ConvertFrom-Json
     $latestVersion=''
     foreach ($version in $json.data.versions) {
