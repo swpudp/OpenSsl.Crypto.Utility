@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSsl.Crypto.Utility", "src\OpenSsl.Crypto.Utility\OpenSsl.Crypto.Utility.csproj", "{B5E13EE3-7401-4B4F-8B7E-46744454A188}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "tests\UnitTests\UnitTests.csproj", "{F6E2A8A0-3A2F-47D0-9240-6EF14BC6D458}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "src\UnitTests\UnitTests.csproj", "{34DD64D3-A598-47D9-A3F0-447299F75F50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{B5E13EE3-7401-4B4F-8B7E-46744454A188}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5E13EE3-7401-4B4F-8B7E-46744454A188}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5E13EE3-7401-4B4F-8B7E-46744454A188}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F6E2A8A0-3A2F-47D0-9240-6EF14BC6D458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6E2A8A0-3A2F-47D0-9240-6EF14BC6D458}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F6E2A8A0-3A2F-47D0-9240-6EF14BC6D458}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F6E2A8A0-3A2F-47D0-9240-6EF14BC6D458}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34DD64D3-A598-47D9-A3F0-447299F75F50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34DD64D3-A598-47D9-A3F0-447299F75F50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34DD64D3-A598-47D9-A3F0-447299F75F50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34DD64D3-A598-47D9-A3F0-447299F75F50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,8 +7,8 @@
 		<RepositoryUrl>https://github.com/swpudp/OpenSsl.Crypto.Utility</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>crypto,openssl,bc</PackageTags>
-		<AssemblyVersion>1.0.1.1</AssemblyVersion>
-		<FileVersion>1.0.1.1</FileVersion>
+		<AssemblyVersion>1.0.1.2</AssemblyVersion>
+		<FileVersion>1.0.1.2</FileVersion>
 		<EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
 		<EnableNETAnalyzers>False</EnableNETAnalyzers>
 		<PackageReleaseNotes>add des,unit tests</PackageReleaseNotes>
@@ -18,6 +18,7 @@
 		<Authors>swpudp</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Version>$(VersionPrefix)</Version>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
