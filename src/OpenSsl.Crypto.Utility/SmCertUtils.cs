@@ -49,10 +49,10 @@ namespace OpenSsl.Crypto.Utility
         {
             AsymmetricCipherKeyPair cipherKeyPair = CreateKeyPairInternal();
             //提取公钥点
-            ECPoint ecPoint = ((ECPublicKeyParameters) cipherKeyPair.Public).Q;
+            ECPoint ecPoint = ((ECPublicKeyParameters)cipherKeyPair.Public).Q;
             //公钥前面的02或者03表示是压缩公钥,04表示未压缩公钥,04的时候,可以去掉前面的04
             string publicKey = Hex.ToHexString(ecPoint.GetEncoded(compressedPubKey));
-            BigInteger privateKey = ((ECPrivateKeyParameters) cipherKeyPair.Private).D;
+            BigInteger privateKey = ((ECPrivateKeyParameters)cipherKeyPair.Private).D;
             string priKey = Hex.ToHexString(privateKey.ToByteArrayUnsigned());
             return new CipherKeyPair(publicKey, priKey);
         }
@@ -86,7 +86,7 @@ namespace OpenSsl.Crypto.Utility
         public static ECPrivateKeyParameters GetPrivateKeyFromP12(byte[] sm2FileData, string password)
         {
             Asn1Sequence seq = Asn1Sequence.GetInstance(sm2FileData);
-            return ParsePrivateKey((Asn1Sequence) seq[1], password);
+            return ParsePrivateKey((Asn1Sequence)seq[1], password);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace OpenSsl.Crypto.Utility
             }
 
             Asn1Sequence seq = Asn1Sequence.GetInstance(sm2FileData);
-            X509Certificate[] certs = ParseP12Certs((Asn1Sequence) seq[2]);
+            X509Certificate[] certs = ParseP12Certs((Asn1Sequence)seq[2]);
             return certs[0];
         }
 
@@ -143,9 +143,9 @@ namespace OpenSsl.Crypto.Utility
                 throw new Exception("the sm2 file is not right format.can not get the public part");
             }
 
-            Asn1OctetString pubOctString = (Asn1OctetString) publicInfo[1];
+            Asn1OctetString pubOctString = (Asn1OctetString)publicInfo[1];
             X509CertificateStructure structure = X509CertificateStructure.GetInstance(pubOctString.GetOctets());
-            return new[] {new X509Certificate(structure)};
+            return new[] { new X509Certificate(structure) };
         }
 
 
@@ -240,12 +240,27 @@ namespace OpenSsl.Crypto.Utility
         /// <summary>
         /// 创建证书
         /// </summary>
+        /// <param name="privateKey"></param>
+        /// <param name="publicKey"></param>
+        /// <param name="subjectName"></param>
+        /// <param name="issuerName"></param>
+        /// <returns></returns>
+        public static X509Certificate MakeCert(byte[] privateKey, byte[] publicKey, string subjectName, string issuerName)
+        {
+            ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(new BigInteger(1, privateKey), SmParameters.DomainParameters);
+            ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(SmParameters.DomainParameters.Curve.DecodePoint(publicKey), SmParameters.DomainParameters);
+            return MakeCert(privateKeyParameters, publicKeyParameters, subjectName, issuerName);
+        }
+
+        /// <summary>
+        /// 创建证书
+        /// </summary>
         /// <param name="privateParameter"></param>
         /// <param name="publicParameter"></param>
         /// <param name="subjectName"></param>
         /// <param name="issuerName"></param>
         /// <returns></returns>
-        private static X509Certificate MakeCert(AsymmetricKeyParameter privateParameter, AsymmetricKeyParameter publicParameter, string subjectName, string issuerName)
+        public static X509Certificate MakeCert(AsymmetricKeyParameter privateParameter, AsymmetricKeyParameter publicParameter, string subjectName, string issuerName)
         {
             ISignatureFactory sigFact = new Asn1SignatureFactory(GMObjectIdentifiers.sm2sign_with_sm3.Id, privateParameter);
             X509V3CertificateGenerator sm2CertGen = new X509V3CertificateGenerator();

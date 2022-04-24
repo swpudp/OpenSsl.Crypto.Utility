@@ -249,12 +249,12 @@ namespace UnitTests
         {
             byte[] content = Guid.NewGuid().ToByteArray();
             byte[] privateKey = HexUtils.ToByteArray(cipherKeyPair.Private);
-            byte[] signBytes = SignatureUtils.Sm2Sign(privateKey, content, false, false);
+            byte[] signBytes = SignatureUtils.Sm2Sign(privateKey, content);
             string sign = HexUtils.ToHexString(signBytes);
             Console.WriteLine("KeyPairVerify->sign：" + sign);
 
             byte[] publicKey = HexUtils.ToByteArray(cipherKeyPair.Public);
-            bool isSuccess = SignatureUtils.Sm2Verify(publicKey, content, HexUtils.ToByteArray(sign), false, false);
+            bool isSuccess = SignatureUtils.Sm2Verify(publicKey, content, HexUtils.ToByteArray(sign));
             Assert.AreEqual(true, isSuccess);
         }
     }

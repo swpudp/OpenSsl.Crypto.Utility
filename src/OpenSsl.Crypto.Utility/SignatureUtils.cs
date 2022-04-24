@@ -1,5 +1,7 @@
 ﻿using System;
 using OpenSsl.Crypto.Utility.Internal;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 
 namespace OpenSsl.Crypto.Utility
@@ -45,12 +47,11 @@ namespace OpenSsl.Crypto.Utility
         /// </summary>
         /// <param name="privateKey">公钥</param>
         /// <param name="content">待签名内容</param>
-        /// <param name="forPlainDsa">是否原始字节，否则按der编码</param>
         /// <param name="forSm2">使用sm2编码</param>
         /// <returns>签名字符串</returns>
-        public static byte[] Sm2Sign(byte[] privateKey, byte[] content, bool forPlainDsa, bool forSm2)
+        public static byte[] Sm2Sign(byte[] privateKey, byte[] content, bool forSm2 = false)
         {
-            return SmUtils.Sign(privateKey, content, forPlainDsa, forSm2);
+            return SmUtils.Sign(privateKey, content, forSm2);
         }
 
         /// <summary>
@@ -71,12 +72,24 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="publicKey">公钥</param>
         /// <param name="content">待签名内容,如有其他处理如加密一次等，请先处理后传入</param>
         /// <param name="signBytes">签名值字节数组</param>
-        /// <param name="forPlainDsa">是否返回原文，否则按der编码返回</param>
         /// <param name="forSm2">使用sm2编码</param>
         /// <returns>是否成功</returns>
-        public static bool Sm2Verify(byte[] publicKey, byte[] content, byte[] signBytes, bool forPlainDsa, bool forSm2)
+        public static bool Sm2Verify(byte[] publicKey, byte[] content, byte[] signBytes, bool forSm2 = false)
         {
-            return SmUtils.Verify(publicKey, content, signBytes, forPlainDsa, forSm2);
+            return SmUtils.Verify(publicKey, content, signBytes, forSm2);
+        }
+
+        /// <summary>
+        /// SM2验签
+        /// </summary>
+        /// <param name="cert">证书</param>
+        /// <param name="content">待签名内容,如有其他处理如加密一次等，请先处理后传入</param>
+        /// <param name="signBytes">签名值字节数组</param>
+        /// <param name="forSm2">使用sm2编码</param>
+        /// <returns>是否成功</returns>
+        public static bool Sm2Verify(X509Certificate cert, byte[] content, byte[] signBytes, bool forSm2 = false)
+        {
+            return SmUtils.Verify(cert, content, signBytes, forSm2);
         }
 
         /// <summary>
@@ -92,5 +105,24 @@ namespace OpenSsl.Crypto.Utility
         }
 
         #endregion
+
+        /// <summary>
+        /// 验证签名
+        /// </summary>
+        /// <param name="alg">公钥</param>
+        /// <param name="cert">公钥</param>
+        /// <param name="content">待签名内容</param>
+        /// <param name="sign">签名值</param>
+        /// <returns></returns>
+        public static bool Verify(string alg, X509Certificate cert, byte[] content, byte[] sign)
+        {
+            ISigner signer = SignerUtilities.GetSigner(alg);
+            AsymmetricKeyParameter p = cert.GetPublicKey();
+            signer.Init(false, p);
+            signer.BlockUpdate(content, 0, content.Length);
+            //验证签名结果
+            bool verify = signer.VerifySignature(sign);
+            return verify;
+        }
     }
 }

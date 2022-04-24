@@ -124,7 +124,7 @@ namespace UnitTests
             byte[] privateKey = HexUtils.ToByteArray(privateKeyHex);
             byte[] content = Encoding.UTF8.GetBytes(source);
 
-            byte[] signBytes = SignatureUtils.Sm2Sign(privateKey, content, false, false);
+            byte[] signBytes = SignatureUtils.Sm2Sign(privateKey, content);
             //hex
             string sign = HexUtils.ToHexString(signBytes);
             Assert.IsNotNull(sign);
@@ -171,7 +171,6 @@ namespace UnitTests
             Assert.IsTrue(isOk);
         }
 
-
         /// <summary>
         /// 生成证书测试
         /// </summary>
@@ -202,7 +201,7 @@ namespace UnitTests
             string source = "123456";
             byte[] privateKey = HexUtils.ToByteArray(privateKeyHex);
             byte[] content = Encoding.UTF8.GetBytes(source);
-            byte[] signBytes = SignatureUtils.Sm2Sign(privateKey, content, false, true);
+            byte[] signBytes = SignatureUtils.Sm2Sign(privateKey, content, true);
             //to hex
             string sign = HexUtils.ToHexString(signBytes);
             Assert.IsNotNull(sign);
@@ -210,7 +209,7 @@ namespace UnitTests
             //to base64
             Console.WriteLine("Sm2SignWithSm2SignatureTest->sign Base64:" + Convert.ToBase64String(signBytes));
             string publicKeyHex = "048e2e2cff6c8ebfaaf8d9cb43c0afd62cc992833708e564678803d00d0983229fe4f4e75e0ba6b57b246d9b98fb19b11b17140ea251cef71d27dd76f5e88865e5";
-            bool isOk = SignatureUtils.Sm2Verify(HexUtils.ToByteArray(publicKeyHex), content, signBytes, false, true);
+            bool isOk = SignatureUtils.Sm2Verify(HexUtils.ToByteArray(publicKeyHex), content, signBytes, true);
             Assert.IsTrue(isOk);
         }
 
@@ -224,13 +223,28 @@ namespace UnitTests
             byte[] content = Encoding.UTF8.GetBytes(source);
             //hex
             string signHex = "304402200ed5bdb7102a1b91ff86a8b39f7e9a3ed3967bc51f1640a60f64cd562f1afac702206eec6c52389b4e9c2ba3548a963abc91d8b8571138427d438bbd4ffb2fcf9f4f";
-            bool isSuccess = SignatureUtils.Sm2Verify(publicKey, content, HexUtils.ToByteArray(signHex), false, false);
+            bool isSuccess = SignatureUtils.Sm2Verify(publicKey, content, HexUtils.ToByteArray(signHex));
             Assert.AreEqual(true, isSuccess);
 
             //base64
             string signBase64 = "MEQCIA7VvbcQKhuR/4aos59+mj7TlnvFHxZApg9kzVYvGvrHAiBu7GxSOJtOnCujVIqWOryR2LhXEThCfUOLvU/7L8+fTw==";
-            isSuccess = SignatureUtils.Sm2Verify(publicKey, content, Convert.FromBase64String(signBase64), false, false);
+            isSuccess = SignatureUtils.Sm2Verify(publicKey, content, Convert.FromBase64String(signBase64));
             Assert.AreEqual(true, isSuccess);
+        }
+
+        [TestMethod]
+        public void Sm2VerifyWithCertTest()
+        {
+            string privateKeyHex = "8a455cd2b5d8cbb164188f1aafa102ba7a381d97a5520c79a2a9fabf25f43e48";
+            string publicKeyHex = "048e2e2cff6c8ebfaaf8d9cb43c0afd62cc992833708e564678803d00d0983229fe4f4e75e0ba6b57b246d9b98fb19b11b17140ea251cef71d27dd76f5e88865e5";
+            byte[] privateKey = HexUtils.ToByteArray(privateKeyHex);
+            byte[] publicKey = HexUtils.ToByteArray(publicKeyHex);
+            X509Certificate cert = SmCertUtils.MakeCert(privateKey, publicKey, "test1", "test2");
+            string source = "123456";
+            byte[] content = Encoding.UTF8.GetBytes(source);
+            byte[] signBytes = SignatureUtils.Sm2Sign(privateKey, content, true);
+            bool isOk = SignatureUtils.Sm2Verify(cert, content, signBytes, true);
+            Assert.IsTrue(isOk);
         }
     }
 }

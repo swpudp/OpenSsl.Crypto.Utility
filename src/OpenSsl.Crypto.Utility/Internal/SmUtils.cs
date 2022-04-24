@@ -6,6 +6,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
 
 namespace OpenSsl.Crypto.Utility.Internal
@@ -100,7 +101,7 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <returns></returns>
         internal static byte[] Sign(byte[] privateKey, X509Certificate x509Cert, byte[] sourceData)
         {
-            byte[] signature = SmUtils.Sign(privateKey, sourceData, true, false);
+            byte[] signature = SmUtils.Sign(privateKey, sourceData, true);
             return SmPkcs7Utils.Package(signature, x509Cert, sourceData);
         }
 
@@ -109,35 +110,33 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// </summary>
         /// <param name="privateKey">公钥</param>
         /// <param name="contentBytes">待签名内容</param>
-        /// <param name="forPlainDsa">是否使用原始字节，否则是否der编码字节</param>
         /// <param name="forSm2">使用sm2编码</param>
         /// <remarks>适用于对签名字节数组自行编码</remarks>
         /// <returns>签名字节数组</returns>
-        internal static byte[] Sign(byte[] privateKey, byte[] contentBytes, bool forPlainDsa, bool forSm2)
+        internal static byte[] Sign(byte[] privateKey, byte[] contentBytes, bool forSm2)
         {
             ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(new BigInteger(1, privateKey), SmParameters.DomainParameters);
-            IDsaEncoding dsaEncoding;
-            if (forPlainDsa)
-            {
-                dsaEncoding = PlainDsaEncoding.Instance;
-            }
-            else
-            {
-                dsaEncoding = StandardDsaEncoding.Instance;
-            }
-
             //创建签名实例
-            SM2Signer sm2Signer = new SM2Signer(dsaEncoding);
-            sm2Signer.Init(true, privateKeyParameters);
+            SM2Signer sm2Signer = GetSigner(privateKeyParameters, true, forSm2);
             sm2Signer.BlockUpdate(contentBytes, 0, contentBytes.Length);
             byte[] signature = sm2Signer.GenerateSignature();
-            if (!forSm2)
-            {
-                return signature;
-            }
+            return signature;
+        }
 
-            Asn1Sequence primitive = Asn1Sequence.GetInstance(signature);
-            return new Sm2Signature(primitive).GetRawBytes();
+        /// <summary>
+        /// 验证sm2签名（字节数组）
+        /// </summary>
+        /// <param name="cert">证书</param>
+        /// <param name="contentBytes">待签名内容,如有其他处理如加密一次等，请先处理后传入</param>
+        /// <param name="signBytes">签名值字节数组</param>
+        /// <param name="forSm2">是否sm2编码</param>
+        /// <returns>是否成功</returns>
+        internal static bool Verify(X509Certificate cert, byte[] contentBytes, byte[] signBytes, bool forSm2)
+        {
+            //创建签名实例
+            SM2Signer sm2Signer = GetSigner(cert.GetPublicKey(), false, forSm2);
+            sm2Signer.BlockUpdate(contentBytes, 0, contentBytes.Length);
+            return sm2Signer.VerifySignature(signBytes);
         }
 
         /// <summary>
@@ -146,14 +145,27 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <param name="publicKeyBytes">公钥</param>
         /// <param name="contentBytes">待签名内容,如有其他处理如加密一次等，请先处理后传入</param>
         /// <param name="signBytes">签名值字节数组</param>
-        /// <param name="forPlainDsa">是否原文，否则按der编码</param>
         /// <param name="forSm2">是否sm2编码</param>
         /// <returns>是否成功</returns>
-        internal static bool Verify(byte[] publicKeyBytes, byte[] contentBytes, byte[] signBytes, bool forPlainDsa, bool forSm2)
+        internal static bool Verify(byte[] publicKeyBytes, byte[] contentBytes, byte[] signBytes, bool forSm2)
         {
             ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(SmParameters.DomainParameters.Curve.DecodePoint(publicKeyBytes), SmParameters.DomainParameters);
+            SM2Signer sm2Signer = GetSigner(publicKeyParameters, false, forSm2);
+            sm2Signer.BlockUpdate(contentBytes, 0, contentBytes.Length);
+            return sm2Signer.VerifySignature(signBytes);
+        }
+
+        /// <summary>
+        /// 获取签名实例
+        /// </summary>
+        /// <param name="publicKeyParameters"></param>
+        /// <param name="forSign"></param>
+        /// <param name="forSm2"></param>
+        /// <returns></returns>
+        private static SM2Signer GetSigner(AsymmetricKeyParameter publicKeyParameters, bool forSign, bool forSm2)
+        {
             IDsaEncoding dsaEncoding;
-            if (forPlainDsa)
+            if (forSm2)
             {
                 dsaEncoding = PlainDsaEncoding.Instance;
             }
@@ -164,10 +176,8 @@ namespace OpenSsl.Crypto.Utility.Internal
 
             //创建签名实例
             SM2Signer sm2Signer = new SM2Signer(dsaEncoding);
-            sm2Signer.Init(false, publicKeyParameters);
-            byte[] signature = forSm2 ? new Sm2Signature(signBytes).GetEncoded() : signBytes;
-            sm2Signer.BlockUpdate(contentBytes, 0, contentBytes.Length);
-            return sm2Signer.VerifySignature(signature);
+            sm2Signer.Init(forSign, publicKeyParameters);
+            return sm2Signer;
         }
 
         /// <summary>

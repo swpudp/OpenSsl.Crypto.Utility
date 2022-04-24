@@ -41,7 +41,7 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <returns></returns>
         internal static byte[] Package(byte[] signature, X509Certificate x509Cert, byte[] sourceData)
         {
-            byte[] signData = GetSignData(new[] {x509Cert}, signature, sourceData);
+            byte[] signData = GetSignData(new[] { x509Cert }, signature, sourceData);
             CmsSignedData signedData = new CmsSignedData(signData);
             byte[] encoding = signedData.GetEncoded(Asn1Encodable.Der);
             return encoding;
@@ -55,7 +55,7 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <param name="func">验证函数</param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
-        internal static bool UnPackage(byte[] sourceData, byte[] signature, Func<byte[], byte[], byte[], bool, bool, bool> func)
+        internal static bool UnPackage(byte[] sourceData, byte[] signature, Func<byte[], byte[], byte[], bool, bool> func)
         {
             CmsSignedDataParser sp = new CmsSignedDataParser(signature);
             sp.GetSignedContent().Drain();
@@ -75,8 +75,10 @@ namespace OpenSsl.Crypto.Utility.Internal
 
                 byte[] encryptedDigest = signerInfo.GetSignature();
                 Sm2Signature sm2Signature = Sm2Signature.GetInstance(encryptedDigest);
+                byte[] signBytes = sm2Signature.GetRawBytes();
+
                 byte[] publicKey = SmCertUtils.GetPublicKey(cert.GetPublicKey());
-                bool verify = func(publicKey, sourceData, sm2Signature.GetRawBytes(), true, true);
+                bool verify = func(publicKey, sourceData, signBytes, true);
                 if (!verify)
                 {
                     return false;
@@ -137,103 +139,6 @@ namespace OpenSsl.Crypto.Utility.Internal
             AlgorithmIdentifier digestAlgIdentifier = new AlgorithmIdentifier(GMObjectIdentifiers.sm3, DerNull.Instance);
             AlgorithmIdentifier digestEncryptAlgIdentifier = new AlgorithmIdentifier(GMObjectIdentifiers.sm2sign, DerNull.Instance);
             return new SignerInfo(signInfoVersion, issuerAndSn, digestAlgIdentifier, null, digestEncryptAlgIdentifier, new DerOctetString(signData.ToAsn1Object()), null);
-        }
-    }
-
-    internal class Sm2Signature : Asn1Encodable
-    {
-        private readonly DerInteger _r;
-        private readonly DerInteger _s;
-
-        public static Sm2Signature GetInstance(object o)
-        {
-            if (o == null)
-            {
-                throw new ArgumentNullException("Sm2Signature missing object for getInstance");
-            }
-
-            if (o is Sm2Signature sign)
-            {
-                return sign;
-            }
-
-            return new Sm2Signature(Asn1Sequence.GetInstance(o));
-        }
-
-        public Sm2Signature(byte[] signBytes)
-        {
-            if (signBytes == null)
-            {
-                throw new ArgumentNullException("Sm2Signature signBytes missing");
-            }
-
-            if (signBytes.Length != 64)
-            {
-                throw new ArgumentNullException("Sm2Signature signBytes required length=64");
-            }
-
-            _r = new DerInteger(Arrays.CopyOfRange(signBytes, 0, 32));
-            _s = new DerInteger(Arrays.CopyOfRange(signBytes, 32, 64));
-        }
-
-        public Sm2Signature(DerInteger r, DerInteger s)
-        {
-            _r = r;
-            _s = s;
-        }
-
-        public Sm2Signature(BigInteger r, BigInteger s)
-        {
-            if (r == null)
-            {
-                throw new ArgumentNullException("Sm2Signature missing R:signR");
-            }
-
-            if (s == null)
-            {
-                throw new ArgumentNullException("Sm2Signature missing S:signS");
-            }
-
-            _r = new DerInteger(r);
-            _s = new DerInteger(s);
-        }
-
-        public Sm2Signature(Asn1Sequence seq)
-        {
-            if (seq == null)
-            {
-                throw new ArgumentNullException("Sm2Signature missing seq");
-            }
-
-            if (seq.Count != 2)
-            {
-                throw new ArgumentNullException("Sm2Signature seq required size=2");
-            }
-
-            IEnumerator e = seq.GetEnumerator();
-            e.MoveNext();
-            _r = DerInteger.GetInstance(e.Current);
-
-            e.MoveNext();
-            _s = DerInteger.GetInstance(e.Current);
-        }
-
-        public byte[] GetRawBytes()
-        {
-            byte[] dest = new byte[64];
-            Array.Copy(BigIntegers.AsUnsignedByteArray(32, _r.PositiveValue), 0, dest, 0, 32);
-            Array.Copy(BigIntegers.AsUnsignedByteArray(32, _s.PositiveValue), 0, dest, 32, 32);
-            return dest;
-        }
-
-        public override Asn1Object ToAsn1Object()
-        {
-            Asn1EncodableVector v = new Asn1EncodableVector
-            {
-                _r,
-                _s
-            };
-            return new DerSequence(v);
         }
     }
 }
