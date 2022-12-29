@@ -162,7 +162,7 @@ namespace UnitTests
 
             var validFrom = DateTime.Today.AddDays(-1);
             var validTo = DateTime.Today.AddYears(10);
-            string cert = RsaCertUtils.GenerateBySelf(new[] {"sk-soc"}, 1024, validFrom, validTo, out string caPrivateCert);
+            string cert = RsaCertUtils.GenerateBySelf(new[] { "sk-soc" }, 1024, validFrom, validTo, out string caPrivateCert);
             File.WriteAllText(CaKeyFilePath, caPrivateCert);
             File.WriteAllText(CaCerFilePath, cert);
         }
@@ -331,13 +331,51 @@ namespace UnitTests
             byte[] publicKey = Convert.FromBase64String(publicKeyBase64);
             byte[] privateKey = Convert.FromBase64String(privateKeyBase64);
 
-            byte[] cipherBytes = CryptoUtils.RsaEncrypt(publicKey, (content), CipherMode.NONE, CipherPadding.PKCS1);
+            byte[] cipherBytes = CryptoUtils.RsaEncrypt(publicKey, content, CipherMode.NONE, CipherPadding.PKCS1);
             string cipher = HexUtils.ToHexString(cipherBytes);
 
             byte[] cipherBytes1 = HexUtils.ToByteArray(cipher);
             Assert.IsTrue(ArrayEquals(cipherBytes, cipherBytes1));
             byte[] expected = CryptoUtils.RsaDecrypt(privateKey, cipherBytes, CipherMode.NONE, CipherPadding.PKCS1);
             Assert.IsTrue(ArrayEquals(content, expected));
+        }
+
+        [TestMethod]
+        public void PaddingTest()
+        {
+            string privateKeyBase64 = "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAO9ZxSM9SRCiyybIVvBYOXWDJtEieakJS4b7Qtt1jyPJliAICPbl0zNrvuhK8onC/y7q/S+Oq5Y8pbezC9Uglu0gqvgBj0UaCnQmXNZdkotefnJvdTZI6tgbCaPCxW9sXQJlHPjQSHR2B+dKRONPbdjYWACUwYERWGYzC/q0Y1uRAgMBAAECgYAPzG9Ilq8qc8cQsxuYogd/kV3FYyRVpdaVkniExNs4Y6zO8MjVXIaBd+SyL4mX0fEHF0gJVL5QXIYcZys/m6GVOlVCJPjr9AtcinHIpY6Yh2Zes4DWKayc0dQ9b3bB9ghWv/M8cIeJG8ac8My92Rf9+BXoCUEgC6uzBlC0JAxD0wJBAPuSYQclvYpW7UQWhZxEeH1ugeeXTsdKDm0PowjPnOggWVYJrdfD/G8Ei/g4AZptfw1fbploNLXsKs/w2zWyWv8CQQDzkFIehH//jSTf6HOcfa2uxpIoM39XF2c/gULlhkiXffAvau8jZ3uHtw/NjoPgyKjF4QoMFkeV5a+f1wy11RlvAkEA1l0w2IpMLClOHAqk5zdhBGC5yMGhmyd7i2sbnVJrfVCzTyEIRSb3XxIcwvHWS+SpspdzAr1MzQfkozO1VtgXuQJADKlxC3MZ8GAXDajY8ca6074w9PQQZ6eoz21Z2/LKLU33wY9OlUmY62pB4Q7KnlHwLDFRw2UZHZrOMYINgBpu8wJAQa/C7S/zKNIdqLNBSckJbH+W7zDFBSevGcPB1VesWjZ5wJcuJa6iMwXAq/ci2bOlMsZSbN0bnsEb+mWqQ21L5g==";
+            string publicKeyBase64 = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvWcUjPUkQossmyFbwWDl1gybRInmpCUuG+0LbdY8jyZYgCAj25dMza77oSvKJwv8u6v0vjquWPKW3swvVIJbtIKr4AY9FGgp0JlzWXZKLXn5yb3U2SOrYGwmjwsVvbF0CZRz40Eh0dgfnSkTjT23Y2FgAlMGBEVhmMwv6tGNbkQIDAQAB";
+            byte[] content = Guid.NewGuid().ToByteArray();
+            byte[] publicKey = Convert.FromBase64String(publicKeyBase64);
+            byte[] privateKey = Convert.FromBase64String(privateKeyBase64);
+
+
+            byte[] cipherBytes1 = CryptoUtils.RsaEncrypt(publicKey, content, CipherMode.CBC, CipherPadding.PKCS1);
+
+
+            var cipherModes = new CipherMode[] { CipherMode.ECB, CipherMode.NONE, CipherMode.CBC, CipherMode.CCM, CipherMode.CFB, CipherMode.CTR, CipherMode.CTS, CipherMode.EAX, CipherMode.GCM, CipherMode.GOFB, CipherMode.OCB, CipherMode.OFB, CipherMode.OPENPGPCFB, CipherMode.SIC };
+            var cipherPaddings = new CipherPadding[] { CipherPadding.NONE, CipherPadding.RAW, CipherPadding.ISO10126, CipherPadding.ISO7816d4, CipherPadding.ISO97961, CipherPadding.OAEP, CipherPadding.OAEPWITHMD5ANDMGF1, CipherPadding.OAEPWITHSHA1ANDMGF1, CipherPadding.OAEPWITHSHA224ANDMGF1, CipherPadding.OAEPWITHSHA256ANDMGF1, CipherPadding.OAEPWITHSHA256ANDMGF1WITHSHA256, CipherPadding.OAEPWITHSHA256ANDMGF1WITHSHA1, CipherPadding.OAEPWITHSHA384ANDMGF1, CipherPadding.OAEPWITHSHA512ANDMGF1, CipherPadding.PKCS1, CipherPadding.PKCS5, CipherPadding.PKCS7, CipherPadding.TBC, CipherPadding.WITHCTS, CipherPadding.X923, CipherPadding.ZEROBYTE };
+
+            foreach (var cipherMode in cipherModes)
+            {
+                foreach (var cipherPadding in cipherPaddings)
+                {
+                    try
+                    {
+                        byte[] cipherBytes = CryptoUtils.RsaEncrypt(publicKey, content, cipherMode, cipherPadding);
+                        Assert.IsNotNull(cipherBytes);
+
+                        byte[] expected = CryptoUtils.RsaDecrypt(privateKey, cipherBytes, cipherMode, cipherPadding);
+                        Assert.IsNotNull(expected);
+
+                        Assert.IsTrue(ArrayEquals(content, expected));
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"{cipherMode}/{cipherPadding}不支持：{e}");
+                    }
+                }
+            }
         }
 
         private static bool ArrayEquals(byte[] a, byte[] b)

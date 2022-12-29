@@ -10,7 +10,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="hexValue"></param>
         /// <returns></returns>
         public static byte[] ToByteArray(string hexValue)
-        {
+        {         
             return Hex.Decode(hexValue);
         }
 

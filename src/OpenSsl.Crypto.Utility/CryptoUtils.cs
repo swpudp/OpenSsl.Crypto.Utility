@@ -74,9 +74,23 @@ namespace OpenSsl.Crypto.Utility
             {
                 ivBytes = encoding.GetBytes(iv);
             }
-
             byte[] cipherBytes = SmUtils.Encrypt(keyBytes, encoding.GetBytes(plainText), cipherMode, cipherPadding, ivBytes);
-            return (cipherBytes);
+            return cipherBytes;
+        }
+
+        /// <summary>
+        /// SM2加密
+        /// </summary>
+        /// <param name="secretHex">密钥（Hex）</param>
+        /// <param name="plainText">明文</param>
+        /// <param name="encoding">编码方式</param>
+        /// <remarks>密钥长度必须是128位</remarks>
+        /// <returns>密文字节数组</returns>
+        public static byte[] Sm2Encrypt(string secretHex, string plainText, Encoding encoding)
+        {
+            byte[] keyBytes = HexUtils.ToByteArray(secretHex);
+            byte[] cipherBytes = SmUtils.Encrypt(keyBytes, encoding.GetBytes(plainText));
+            return cipherBytes;
         }
 
         /// <summary>
@@ -96,6 +110,19 @@ namespace OpenSsl.Crypto.Utility
         }
 
         /// <summary>
+        /// SM2加密
+        /// </summary>
+        /// <param name="keyBytes">密钥（Hex）</param>
+        /// <param name="plainBytes">明文</param>
+        /// <remarks>密钥长度必须是128位</remarks>
+        /// <returns>密文字节数组</returns>
+        public static byte[] Sm2Encrypt(byte[] keyBytes, byte[] plainBytes)
+        {
+            byte[] cipherBytes = SmUtils.Encrypt(keyBytes, plainBytes);
+            return cipherBytes;
+        }
+
+        /// <summary>
         /// SM4解密
         /// </summary>
         /// <param name="keyBytes">密钥</param>
@@ -108,6 +135,18 @@ namespace OpenSsl.Crypto.Utility
         public static byte[] Sm4Decrypt(byte[] keyBytes, byte[] cipherBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
         {
             return SmUtils.Decrypt(keyBytes, cipherBytes, cipherMode, cipherPadding, iv);
+        }
+
+        /// <summary>
+        /// SM2解密
+        /// </summary>
+        /// <param name="keyBytes">密钥</param>
+        /// <param name="cipherBytes">密文字节数组</param>
+        /// <remarks>密钥长度必须是128位</remarks>
+        /// <returns>明文</returns>
+        public static byte[] Sm2Decrypt(byte[] keyBytes, byte[] cipherBytes)
+        {
+            return SmUtils.Decrypt(keyBytes, cipherBytes);
         }
 
         /// <summary>
@@ -129,8 +168,26 @@ namespace OpenSsl.Crypto.Utility
             {
                 ivBytes = encoding.GetBytes(iv);
             }
-
             byte[] plainBytes = SmUtils.Decrypt(keyBytes, cipherBytes, cipherMode, cipherPadding, ivBytes);
+            return encoding.GetString(plainBytes);
+        }
+
+
+        /// <summary>
+        /// SM2解密
+        /// </summary>
+        /// <param name="key">密钥</param>
+        /// <param name="cipherBytes">密文</param>
+        /// <param name="encoding">文本编码</param>
+        /// <param name="cipherMode">加密模式</param>
+        /// <param name="cipherPadding">数据填充方式</param>
+        /// <param name="iv">密钥偏移量</param>
+        /// <remarks>密钥长度必须是128位</remarks>
+        /// <returns>明文</returns>
+        public static string Sm2Decrypt(string key, byte[] cipherBytes, Encoding encoding)
+        {
+            byte[] keyBytes = HexUtils.ToByteArray(key);
+            byte[] plainBytes = SmUtils.Decrypt(keyBytes, cipherBytes);
             return encoding.GetString(plainBytes);
         }
 
@@ -151,7 +208,7 @@ namespace OpenSsl.Crypto.Utility
         {
             byte[] publicKeyBytes = Convert.FromBase64String(publicKey);
             byte[] cipher = RsaUtils.Encrypt(publicKeyBytes, encoding.GetBytes(plainText), cipherMode, padding);
-            return (cipher);
+            return cipher;
         }
 
         /// <summary>
@@ -164,7 +221,7 @@ namespace OpenSsl.Crypto.Utility
         /// <returns>密文字节数组</returns>
         public static byte[] RsaEncrypt(byte[] publicKey, byte[] plainTextBytes, CipherMode cipherMode, CipherPadding padding)
         {
-            return RsaUtils.Encrypt(publicKey, (plainTextBytes), cipherMode, padding);
+            return RsaUtils.Encrypt(publicKey, plainTextBytes, cipherMode, padding);
         }
 
         /// <summary>

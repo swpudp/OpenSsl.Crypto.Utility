@@ -5,8 +5,8 @@
     /// </summary>
     public enum CipherMode
     {
-        ECB,
         NONE,
+        ECB,
         CBC,
         CCM,
         CFB,

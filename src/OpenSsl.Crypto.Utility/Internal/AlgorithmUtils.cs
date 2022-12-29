@@ -7,7 +7,7 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <summary>
         /// 加密模式
         /// </summary>
-        private static readonly Dictionary<CipherMode, string> RsaCipherModes = new Dictionary<CipherMode, string>
+        private static readonly Dictionary<CipherMode, string> CipherModes = new Dictionary<CipherMode, string>
         {
             [CipherMode.NONE] = "NONE",
             [CipherMode.ECB] = "ECB",
@@ -31,8 +31,9 @@ namespace OpenSsl.Crypto.Utility.Internal
         private static readonly Dictionary<CipherPadding, string> CipherPaddings = new Dictionary<CipherPadding, string>
         {
             [CipherPadding.NONE] = "NoPadding",
+            [CipherPadding.RAW] = string.Empty,
             [CipherPadding.ISO10126] = "ISO10126d2Padding",
-            [CipherPadding.ISO7816d4] = "ISO7816d4Padding",
+            [CipherPadding.ISO7816d4] = "ISO7816_4Padding",
             [CipherPadding.ISO97961] = "ISO9796_1Padding",
             [CipherPadding.OAEP] = "OAEPPadding",
             [CipherPadding.OAEPWITHMD5ANDMGF1] = "OAEPWITHMD5ANDMGF1PADDING",
@@ -40,12 +41,14 @@ namespace OpenSsl.Crypto.Utility.Internal
             [CipherPadding.OAEPWITHSHA224ANDMGF1] = "OAEPWITHSHA224ANDMGF1PADDING",
             [CipherPadding.OAEPWITHSHA256ANDMGF1] = "OAEPWITHSHA256ANDMGF1PADDING",
             [CipherPadding.OAEPWITHSHA256ANDMGF1WITHSHA1] = "OAEPWITHSHA256ANDMGF1WITHSHA1PADDING",
+            [CipherPadding.OAEPWITHSHA256ANDMGF1WITHSHA256] = "OAEPWITHSHA256ANDMGF1WITHSHA256PADDING",
             [CipherPadding.OAEPWITHSHA384ANDMGF1] = "OAEPWITHSHA384ANDMGF1PADDING",
             [CipherPadding.OAEPWITHSHA512ANDMGF1] = "OAEPWITHSHA512ANDMGF1PADDING",
             [CipherPadding.PKCS1] = "PKCS1PADDING",
             [CipherPadding.PKCS5] = "PKCS5PADDING",
             [CipherPadding.PKCS7] = "PKCS7PADDING",
             [CipherPadding.TBC] = "TBCPADDING",
+            [CipherPadding.WITHCTS] = "WITHCTS",
             [CipherPadding.X923] = "X923PADDING",
             [CipherPadding.ZEROBYTE] = "ZEROBYTEPADDING"
         };
@@ -70,7 +73,7 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <exception cref="System.NotSupportedException"></exception>
         private static string GetCipherMode(CipherMode cipherMode)
         {
-            return RsaCipherModes.TryGetValue(cipherMode, out var cipher) ? cipher : throw new System.NotSupportedException(nameof(cipherMode));
+            return CipherModes.TryGetValue(cipherMode, out var cipher) ? cipher : throw new System.NotSupportedException(nameof(cipherMode));
         }
 
         /// <summary>

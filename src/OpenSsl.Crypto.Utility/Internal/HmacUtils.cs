@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Macs;
 using Org.BouncyCastle.Utilities.Encoders;
@@ -153,7 +154,7 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <param name="encoding">编码</param>
         /// <returns>摘要</returns>
         internal static string Md5(string key, string data, Encoding encoding)
-        {
+        {      
             HMac hmac = new HMac(new MD5Digest());
             var hashBytes = hmac.ComputeHashBytes(key, data, encoding);
             return encoding.GetString(Hex.Encode(hashBytes));

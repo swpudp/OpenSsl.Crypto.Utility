@@ -1,12 +1,12 @@
 ﻿using System;
-using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Engines;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
 
 namespace OpenSsl.Crypto.Utility.Internal
@@ -41,10 +41,27 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <param name="iv">密钥偏移量</param>
         /// <remarks>密钥长度必须是128位</remarks>
         /// <returns>密文字节数组</returns>
-        internal static byte[] Encrypt(byte[] keyBytes, byte[] plainBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
+        internal static byte[] Encrypt(byte[] keyBytes, byte[] plainBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv)
         {
             IBufferedCipher cipher = GetSm4Cipher(keyBytes, cipherMode, cipherPadding, true, iv);
             return cipher.DoFinal(plainBytes);
+        }
+
+        /// <summary>
+        /// SM2加密
+        /// </summary>
+        /// <param name="keyBytes">密钥</param>
+        /// <param name="plainBytes">明文字节</param>
+        /// <remarks>密钥长度必须是128位</remarks>
+        /// <returns>密文字节数组</returns>
+        internal static byte[] Encrypt(byte[] keyBytes, byte[] plainBytes)
+        {
+            SM2Engine cipher = new SM2Engine();
+            ECPoint ecPoint = SmParameters.DomainParameters.Curve.DecodePoint(keyBytes);
+            ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(ecPoint, SmParameters.DomainParameters);
+            ParametersWithRandom parametersWithRandom = new ParametersWithRandom(publicKeyParameters, new SecureRandom());
+            cipher.Init(true, parametersWithRandom);
+            return cipher.ProcessBlock(plainBytes, 0, plainBytes.Length);
         }
 
         #endregion
@@ -61,10 +78,27 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <param name="iv">密钥偏移量</param>
         /// <remarks>密钥长度必须是128位</remarks>
         /// <returns>明文字节数组</returns>
-        internal static byte[] Decrypt(byte[] keyBytes, byte[] cipherBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv = null)
+        internal static byte[] Decrypt(byte[] keyBytes, byte[] cipherBytes, CipherMode cipherMode, CipherPadding cipherPadding, byte[] iv)
         {
             IBufferedCipher cipher = GetSm4Cipher(keyBytes, cipherMode, cipherPadding, false, iv);
             byte[] output = cipher.DoFinal(cipherBytes);
+            return output;
+        }
+
+        /// <summary>
+        /// SM4解密
+        /// </summary>
+        /// <param name="keyBytes">密钥</param>
+        /// <param name="cipherBytes">密文字节</param>
+        /// <param name="iv">密钥偏移量</param>
+        /// <remarks>密钥长度必须是128位</remarks>
+        /// <returns>明文字节数组</returns>
+        internal static byte[] Decrypt(byte[] keyBytes, byte[] cipherBytes)
+        {
+            ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(new BigInteger(1, keyBytes), SmParameters.DomainParameters);
+            SM2Engine cipher = new SM2Engine();
+            cipher.Init(false, privateKeyParameters);
+            byte[] output = cipher.ProcessBlock(cipherBytes, 0, cipherBytes.Length);
             return output;
         }
 
@@ -79,18 +113,12 @@ namespace OpenSsl.Crypto.Utility.Internal
             string algorithmName = AlgorithmUtils.GetCipherAlgorithm("SM4", cipherMode, cipherPadding);
             KeyParameter key = ParameterUtilities.CreateKeyParameter("SM4", secretKeyBytes);
             IBufferedCipher cipher = CipherUtilities.GetCipher(algorithmName);
-            if (algorithmName.Contains("ECB"))
+            if (algorithmName.Contains("ECB") || iv == null)
             {
                 cipher.Init(forEncryption, key);
                 return cipher;
             }
-
-            if (iv == null)
-            {
-                throw new ArgumentNullException(nameof(iv));
-            }
-
-            ParametersWithIV parameters = new ParametersWithIV(key, iv);
+            ICipherParameters parameters = new ParametersWithIV(key, iv);
             cipher.Init(forEncryption, parameters);
             return cipher;
         }
