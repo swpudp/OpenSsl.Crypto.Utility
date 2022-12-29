@@ -4,13 +4,16 @@ using OpenSsl.Crypto.Utility.Internal;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.GM;
 using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Agreement;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Operators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.Utilities.Encoders;
 using Org.BouncyCastle.X509;
 using Org.BouncyCastle.X509.Extension;
@@ -45,7 +48,7 @@ namespace OpenSsl.Crypto.Utility
         /// <param name="compressedPubKey">是否压缩公钥 默认压缩</param>
         /// <remarks>公钥前面的02或者03表示是压缩公钥,04表示未压缩公钥,04的时候,可以去掉前面的04</remarks>
         /// <returns>密钥对十六进制字符串</returns>
-        public static CipherKeyPair GenerateKeyPair(bool compressedPubKey = true)
+        public static CipherKeyPair GenerateKeyPair(bool compressedPubKey = false)
         {
             AsymmetricCipherKeyPair cipherKeyPair = CreateKeyPairInternal();
             //提取公钥点
@@ -154,10 +157,20 @@ namespace OpenSsl.Crypto.Utility
         /// </summary>
         /// <param name="pv"></param>
         /// <returns></returns>
-        private static ECPrivateKeyParameters ParseEcPrivateKey(byte[] pv)
-        {
+        public static ECPrivateKeyParameters ParseEcPrivateKey(byte[] pv)
+        {           
             BigInteger id = new BigInteger(1, pv);
             return new ECPrivateKeyParameters(id, SmParameters.DomainParameters);
+        }
+
+        /// <summary>
+        /// 解析公钥
+        /// </summary>
+        /// <param name="publicKeyBytes"></param>
+        /// <returns></returns>
+        public static ECPublicKeyParameters ParseEcPublicKey(byte[] publicKeyBytes)
+        {
+            return new ECPublicKeyParameters(SmParameters.DomainParameters.Curve.DecodePoint(publicKeyBytes), SmParameters.DomainParameters);
         }
 
         /// <summary>

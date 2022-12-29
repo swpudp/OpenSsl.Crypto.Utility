@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using OpenSsl.Crypto.Utility;
+using OpenSsl.Crypto.Utility.Internal;
 using Org.BouncyCastle.Security;
 
 namespace UnitTests
@@ -166,6 +167,25 @@ namespace UnitTests
         }
 
         /// <summary>
+        /// 加密解密测试-CbcPkcs7Padding
+        /// </summary>
+        [TestMethod]
+        public void Sm4EncryptDecryptCbcPkcs7WithoutIvTest()
+        {
+            //string secret = "ZWNyOC00MjAhLWFmNjEtMzAhYTYxZDEhMWV2MC42NjP2MjA0NDY3NDU5MjgwLjk4";
+            string content = "123456";
+            byte[] key = HexUtils.ToByteArray("fa45b16f7dc866bf4a769dd544f88633");
+            byte[] cipherBytes = CryptoUtils.Sm4Encrypt(key, Encoding.UTF8.GetBytes(content), CipherMode.CBC, CipherPadding.PKCS7);
+            string sm4 = HexUtils.ToHexString(cipherBytes);
+
+
+            //echo -n 123456 | gmssl sms4-ecb -e -k 9930689b38bd8fe5f0a112d58428696d | base64
+            //echo U2FsdGVkX195IULDIwWrYnPR6v3UH7kU5kLp+rgqqBc= | base64 -d | gmssl sms4-ecb -d -k 9930689b38bd8fe5f0a112d58428696d
+            byte[] plain = CryptoUtils.Sm4Decrypt(key, HexUtils.ToByteArray(sm4), CipherMode.CBC, CipherPadding.PKCS7);
+            Assert.AreEqual(content, Encoding.UTF8.GetString(plain));
+        }
+
+        /// <summary>
         /// 加密解密测试-CbcNoPadding      
         /// </summary>
         [TestMethod]
@@ -223,7 +243,7 @@ namespace UnitTests
         [TestMethod]
         public void GenerateKeyPairCompressedPubKeyTest()
         {
-            CipherKeyPair? keyPair = SmCertUtils.GenerateKeyPair();
+            CipherKeyPair? keyPair = SmCertUtils.GenerateKeyPair(true);
             Console.WriteLine("sm2 Private:" + keyPair.Private);
             Console.WriteLine("sm2 Public:" + keyPair.Public);
             Assert.AreEqual(true, keyPair.Public.StartsWith("02") || keyPair.Public.StartsWith("03"));
@@ -385,6 +405,31 @@ namespace UnitTests
             string raw = Encoding.UTF8.GetString(plainBytes);
 
             Assert.AreEqual("0bc6f81c613d4038", raw);
+        }
+
+        /// <summary>
+        /// 密钥交换测试
+        /// </summary>
+        [TestMethod]
+        public void KeyExchangeTest()
+        {
+            string aPub = "04531E9ED578F7EAC3711CF7AA65735805FBD42E5665338A580C395723B46BB3D9842957FC15BD8A0EE8C172B3DEF5C142C3D9C895E63B918B0DD9E6373B6FC0AB";
+            string aPri = "34826AC922E8854931F2F4D032011257268075F11D6F1A6DD0B005EC121606F8";
+
+            string bPub = "04052A543A8F42551A9AAC068C662E55AD93AD11699B44DE297885074566007CFFB0C11CBABFBC55EB5C9D915A1D85581F9425A06B03A063BD008C8C3ED08FBC07";
+            string bPri = "31EA77E639E3B295E34B9F08283220142DC90487C802D5B440E279BA4A7C1052";
+
+            //a密钥对
+            var aPair = ExchangeKeyUtils.CreateSmKeyPair(true);
+            //b密钥对
+            var bPair = ExchangeKeyUtils.CreateSmKeyPair(true);
+
+            //exchange a
+            string keyA = ExchangeKeyUtils.SmKeyExchange(HexUtils.ToByteArray(aPri), SmCertUtils.GetPrivateKey(aPair.Private), HexUtils.ToByteArray(bPub), SmCertUtils.GetPublicKey(bPair.Public));
+            //exchange b
+            string keyB = ExchangeKeyUtils.SmKeyExchange(HexUtils.ToByteArray(bPri), SmCertUtils.GetPrivateKey(bPair.Private), HexUtils.ToByteArray(aPub), SmCertUtils.GetPublicKey(aPair.Public));
+
+            Assert.AreEqual(keyA, keyB);
         }
     }
 }
