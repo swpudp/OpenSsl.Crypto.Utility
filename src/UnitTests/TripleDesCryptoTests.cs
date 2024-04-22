@@ -1,8 +1,25 @@
 ﻿using System;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenSsl.Crypto.Utility;
+using Org.BouncyCastle.Asn1.Pkcs;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Agreement;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Pkcs;
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities;
+using Org.BouncyCastle.X509;
 
 namespace UnitTests
 {
@@ -68,7 +85,7 @@ namespace UnitTests
             string key = secretHex.Substring(0, 24);
             string iv = secretHex.Substring(24);
             byte[] ivBytes = encoding.GetBytes(iv);
-            var cipher = "IfZx5s8KvGEXvZgZrXdBLQ==";
+            string cipher = "IfZx5s8KvGEXvZgZrXdBLQ==";
             string actual = CryptoUtils.TripleDesDecrypt(key, Convert.FromBase64String(cipher), CipherMode.CBC, CipherPadding.PKCS5, ivBytes);
             string expected = "42793222";
             Assert.AreEqual(expected, actual);
@@ -88,7 +105,7 @@ namespace UnitTests
             byte[] keyBytes = encoding.GetBytes(key);
             string iv = secretHex.Substring(24);
             byte[] ivBytes = encoding.GetBytes(iv);
-            var cipher = "IfZx5s8KvGEXvZgZrXdBLQ==";
+            string cipher = "IfZx5s8KvGEXvZgZrXdBLQ==";
             string actual = CryptoUtils.TripleDesDecrypt(keyBytes, Convert.FromBase64String(cipher), CipherMode.CBC, CipherPadding.PKCS5, ivBytes);
             string expected = "42793222";
             Assert.AreEqual(expected, actual);
