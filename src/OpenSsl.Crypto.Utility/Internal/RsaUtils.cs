@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Org.BouncyCastle.Asn1;
+﻿using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Security;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace OpenSsl.Crypto.Utility.Internal
 {
@@ -68,6 +71,7 @@ namespace OpenSsl.Crypto.Utility.Internal
         /// <returns></returns>
         internal static byte[] Sign(byte[] privateKey, byte[] plainBytes, RsaSignerAlgorithm algorithm)
         {
+            new PssSigner(new RsaEngine(), new Sha256Digest(), 20);
             var privateKeyInfo = PrivateKeyFactory.CreateKey(privateKey);
             string signAlgorithm = GetAlgorithm(algorithm);
             ISigner signer = SignerUtilities.GetSigner(signAlgorithm);
@@ -126,6 +130,7 @@ namespace OpenSsl.Crypto.Utility.Internal
             [RsaSignerAlgorithm.SHA1withRSA] = "SHA1withRSA",
             [RsaSignerAlgorithm.SHA224withRSA] = "SHA224withRSA",
             [RsaSignerAlgorithm.SHA256withRSA] = "SHA256withRSA",
+            [RsaSignerAlgorithm.SHA256withRSAPss] = "SHA256WithRSA/PSS",
             [RsaSignerAlgorithm.SHA384withRSA] = "SHA384withRSA",
             [RsaSignerAlgorithm.SHA512withRSA] = "SHA512withRSA",
             [RsaSignerAlgorithm.RIPEMD128withRSA] = "RIPEMD128withRSA",

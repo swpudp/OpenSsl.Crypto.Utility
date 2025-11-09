@@ -14,6 +14,7 @@
         SHA384withRSA = 6,
         SHA512withRSA = 7,
         RIPEMD128withRSA = 8,
-        RIPEMD160withRSA = 9
+        RIPEMD160withRSA = 9,
+        SHA256withRSAPss = 10
     }
 }

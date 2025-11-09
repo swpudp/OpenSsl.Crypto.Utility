@@ -113,6 +113,12 @@ namespace UnitTests
             Console.WriteLine(sign);
             isSign = SignatureUtils.RsaVerify(publicKey, data, HexUtils.ToByteArray(sign), RsaSignerAlgorithm.RIPEMD160withRSA);
             Assert.AreEqual(true, isSign);
+
+            sign = HexUtils.ToHexString(SignatureUtils.RsaSign(privateKeyBytes, data, RsaSignerAlgorithm.SHA256withRSAPss));
+            Assert.IsNotNull(sign);
+            Console.WriteLine(sign);
+            isSign = SignatureUtils.RsaVerify(publicKey, data, HexUtils.ToByteArray(sign), RsaSignerAlgorithm.SHA256withRSAPss);
+            Assert.AreEqual(true, isSign);
         }
 
         [TestMethod]
